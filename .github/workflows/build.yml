@@ -24,20 +24,19 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Initialize Web Project & Capacitor
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Initialize Web Project and Capacitor
         run: |
           mkdir www
           cp index.html www/
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core @capacitor/android
+          npm install -D @capacitor/cli
           npx cap init "Kiddo ABC" "com.kiddoabc.app" --web-dir www
           npx cap add android
-          npx cap copy
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          build-root-directory: android
+          npx cap sync
 
       - name: Build Android APK
         run: |
@@ -50,4 +49,3 @@ jobs:
         with:
           name: KiddoABC-APK-Prueba
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
