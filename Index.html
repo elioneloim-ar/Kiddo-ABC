@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="es">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+    
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Detector de Letras y Escritura - Sistema de Logros</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Courier+Prime:wght@700&family=Fredoka:wght@400;600;700&family=Montserrat:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #00cec9;
+      --accent-yellow: #fdcb6e;
+      --accent-red: #ff7675;
+      --accent-green: #55efc4;
+      --accent-orange: #e17055;
+      --bg-gradient: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+      --card-bg: rgba(255, 255, 255, 0.96);
+    }
+    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Fredoka', sans-serif; text-align: center; padding: 15px; margin: 0; min-height: 100vh; background: var(--bg-gradient); color: #2d3436; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+    .app-container { width: 100%; max-width: 600px; background: var(--card-bg); border-radius: 24px; padding: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.25); position: relative; overflow: hidden; margin-bottom: 70px; }
+    
+    .top-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; }
+    h1 { font-size: 26px; color: var(--primary); margin: 0; text-shadow: 2px 2px 0px #ffeaa7; }
+    .header-btns { display: flex; gap: 8px; }
+
+    /* BARRA DE PERFIL ACTIVO */
+    .profile-bar { width: 100%; background: #eef2ff; border: 2px solid var(--primary); border-radius: 14px; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .profile-info { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--primary); font-size: 15px; }
+    .btn-perfil-selector { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px; }
+
+    /* PANTALLAS */
+    .pantalla { display: none; flex-direction: column; align-items: center; gap: 15px; }
+    .activa { display: flex; }
+    
+    /* MENÚ PRINCIPAL 3 ÁREAS */
+    .menu-areas { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+    .card-area { border-radius: 18px; padding: 15px; text-align: left; color: white; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; box-shadow: 0 6px 0 rgba(0,0,0,0.15); }
+    .card-area:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+    .card-area h2 { margin: 0 0 4px 0; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+    .card-area p { margin: 0; font-size: 13px; opacity: 0.9; font-weight: 600; }
+    
+    .area-libre { background: linear-gradient(135deg, #00b894, #00cec9); }
+    .area-reto { background: linear-gradient(135deg, #e17055, #fdcb6e); }
+    .area-quizz { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+
+    .sub-menu { display: none; margin-top: 10px; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; }
+    .btn-sub { background: white; color: #2d3436; border: none; padding: 10px 14px; border-radius: 12px; font-weight: 700; font-family: 'Fredoka', sans-serif; cursor: pointer; text-align: left; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-sub:hover { background: #f8f9fa; }
+
+    .btn-icon { background: #fff; border: 2px solid #dfe6e9; border-radius: 12px; padding: 8px 12px; font-size: 16px; cursor: pointer; font-weight: 700; }
+
+    /* BOTONES */
+    .btn-menu { width: 100%; font-size: 16px; font-weight: 700; padding: 12px; margin: 4px 0; border: none; border-radius: 16px; cursor: pointer; color: white; box-shadow: 0 4px 0px rgba(0,0,0,0.15); transition: all 0.15s ease; }
+    .btn-guardar { background-color: #00b894; color: white; }
+    .btn-volver { background-color: #636e72; font-size: 14px; padding: 8px 16px; width: auto; }
+    .btn-audio { background-color: var(--accent-yellow); color: #d35400; font-size: 14px; padding: 8px 12px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+    .btn-toggle-case { background-color: var(--primary); color: white; font-size: 14px; padding: 8px 12px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+    
+    /* CONFIGURACIÓN Y FORMULARIOS */
+    .input-nombre { font-family: 'Fredoka', sans-serif; font-size: 18px; padding: 10px 15px; border-radius: 12px; border: 2px solid var(--primary); outline: none; text-align: center; width: 80%; margin-bottom: 10px; }
+    .form-config { width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 16px; border: 2px solid #e0e6ed; max-height: 380px; overflow-y: auto; }
+    .config-group { display: flex; flex-direction: column; gap: 4px; }
+    .config-group label { font-size: 14px; font-weight: 700; color: #2d3436; }
+    .config-group select { font-family: 'Fredoka', sans-serif; font-size: 15px; font-weight: 600; padding: 8px; border-radius: 10px; border: 2px solid var(--primary); background: white; color: var(--primary); width: 100%; }
+    .config-checkbox { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; padding: 10px; border-radius: 12px; border: 2px solid #dfe6e9; }
+    .config-checkbox input { width: 20px; height: 20px; cursor: pointer; }
+
+    /* TABLA DE PUNTAJES Y PERFIL */
+    .leaderboard { width: 100%; margin-top: 5px; background: #fff; border-radius: 14px; padding: 10px; border: 2px solid #e0e6ed; max-height: 120px; overflow-y: auto; }
+    .leaderboard h3 { margin: 0 0 8px 0; color: var(--primary); font-size: 15px; }
+    .score-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 8px; border-bottom: 1px solid #f0f0f0; font-weight: 600; }
+    
+    .perfil-card { width: 100%; background: #fff; border-radius: 16px; padding: 15px; border: 2px solid #e0e6ed; max-height: 400px; overflow-y: auto; text-align: left; }
+    .nivel-badge { background: var(--primary); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: inline-block; margin-bottom: 10px; }
+    .grid-logros { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+    .logro-box { background: #f8f9fa; border: 2px solid #dfe6e9; border-radius: 12px; padding: 10px; text-align: center; opacity: 0.4; filter: grayscale(1); transition: all 0.3s; }
+    .logro-box.desbloqueado { opacity: 1; filter: grayscale(0); border-color: var(--accent-yellow); background: #fffdf0; box-shadow: 0 4px 10px rgba(253, 203, 110, 0.4); }
+    .logro-icon { font-size: 32px; }
+    .logro-title { font-size: 12px; font-weight: 700; margin-top: 4px; color: #2d3436; }
+    
+    .grid-letras-dominio { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px; }
+    .letra-dom { padding: 6px; border-radius: 8px; background: #eee; text-align: center; font-size: 12px; font-weight: 700; }
+    .letra-dom.experto { background: #55efc4; color: #005858; }
+    .letra-dom.aprendiendo { background: #ffeaa7; color: #d35400; }
+    .letra-dom.refuerzo { background: #ff7675; color: white; }
+
+    /* LISTA DE GESTIÓN DE PERFILES */
+    .lista-perfiles { width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
+    .item-perfil { background: #f8f9fa; border: 2px solid #dfe6e9; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; }
+    .item-perfil.seleccionado { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
+
+    /* POPUP DE LOGRO NUEVO */
+    .modal-logro { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; animation: pop 0.4s ease; }
+    .modal-content { background: white; border-radius: 24px; padding: 25px; width: 85%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+
+    /* ELEMENTOS DEL JUEGO */
+    .selector-box { background: #f0f3ff; padding: 6px 12px; border-radius: 14px; display: flex; align-items: center; gap: 8px; }
+    select { font-family: 'Fredoka', sans-serif; font-size: 16px; font-weight: 600; padding: 4px 8px; border-radius: 8px; border: 2px solid var(--primary); background: white; color: var(--primary); }
+    .hud-panel { width: 100%; background: #f8f9fa; border-radius: 16px; padding: 10px; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
+    .tiempo { font-size: 18px; color: var(--accent-red); font-weight: 700; }
+    .mensaje { font-size: 18px; font-weight: 700; color: #2d3436; }
+    #tablero { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 180px; padding: 10px; width: 100%; }
+    
+    /* VARIACIONES DINÁMICAS DE TAMAÑO DE LETRAS */
+    .letra { cursor: pointer; border-radius: 16px; background-color: white; border: 3px solid #dfe6e9; box-shadow: 0 4px 0px #b2bec3; transition: transform 0.1s, background-color 0.2s; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .tamano-pequeno { font-size: 24px; width: 42px; height: 42px; border-radius: 12px; }
+    .tamano-normal { font-size: 32px; width: 55px; height: 55px; border-radius: 16px; }
+    .tamano-grande { font-size: 42px; width: 68px; height: 68px; border-radius: 20px; }
+    
+    .letra:active { transform: translateY(3px); box-shadow: 0 1px 0px #b2bec3; }
+    
+    /* EXPLORADOR DINÁMICO DE IMÁGENES (REJILLA ADAPTATIVA DE 4 A 12 IMÁGENES) */
+    .grid-imagenes { display: grid; gap: 12px; width: 100%; margin-top: 10px; }
+    .grid-imagenes.cant-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-imagenes.cant-6 { grid-template-columns: repeat(3, 1fr); }
+    .grid-imagenes.cant-8 { grid-template-columns: repeat(4, 1fr); }
+    .grid-imagenes.cant-10 { grid-template-columns: repeat(5, 1fr); }
+    .grid-imagenes.cant-12 { grid-template-columns: repeat(4, 1fr); }
+
+    .tarjeta-img { background: white; border: 3px solid #dfe6e9; border-radius: 18px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 0px #b2bec3; transition: transform 0.1s, background-color 0.2s; }
+    .tarjeta-img:active { transform: translateY(3px); box-shadow: 0 1px 0px #b2bec3; }
+    
+    /* ESCALADO ADAPTATIVO DE ELEMENTOS SEGÚN CANTIDAD */
+    .cant-4 .tarjeta-img { padding: 20px; }
+    .cant-4 .tarjeta-img .emoji { font-size: 55px; }
+    .cant-4 .tarjeta-img .nombre-obj { font-size: 15px; }
+
+    .cant-6 .tarjeta-img .emoji { font-size: 42px; }
+    .cant-6 .tarjeta-img .nombre-obj { font-size: 13px; }
+
+    .cant-8 .tarjeta-img, .cant-10 .tarjeta-img, .cant-12 .tarjeta-img { padding: 6px; }
+    .cant-8 .tarjeta-img .emoji, .cant-10 .tarjeta-img .emoji, .cant-12 .tarjeta-img .emoji { font-size: 32px; }
+    .cant-8 .tarjeta-img .nombre-obj, .cant-10 .tarjeta-img .nombre-obj, .cant-12 .tarjeta-img .nombre-obj { font-size: 11px; }
+
+    .correcta { background-color: var(--accent-green) !important; border-color: #00b894 !important; box-shadow: 0 4px 0px #00b894 !important; color: #004b39; pointer-events: none; }
+    .incorrecta { background-color: var(--accent-red) !important; border-color: #d63031 !important; box-shadow: 0 4px 0px #d63031 !important; color: white; pointer-events: none; }
+    
+    /* MODO ESCRITURA */
+    .emoji-palabra { font-size: 70px; margin: 5px 0; cursor: pointer; animation: pop 0.4s ease; }
+    .casillas-palabra { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+    .casilla { width: 48px; height: 54px; border: 3px dashed var(--primary); border-radius: 12px; font-size: 28px; font-weight: 700; line-height: 48px; background: #fff; color: var(--primary); cursor: pointer; position: relative; }
+    .casilla.llena { border-style: solid; background: #eef2ff; }
+    .casilla-pista { color: rgba(108, 92, 231, 0.25); border-color: #cbd5e1; }
+
+    /* MODO TRAZADO Y CALIGRAFÍA CON ESTRUCTURA EXTENDIDA PARA MODO PALABRAS Y SELECCIÓN DE TAMAÑO */
+    .canvas-container { position: relative; width: 300px; height: 260px; margin: 10px auto; background: #fff; border: 4px dashed var(--primary); border-radius: 20px; touch-action: none; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: width 0.3s ease; }
+    .canvas-container.modo-palabras { width: 100%; max-width: 520px; height: 260px; }
+    #canvasTrazado { width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+    
+    .canvas-tools { display: flex; gap: 10px; justify-content: center; margin-top: 8px; width: 100%; }
+    .btn-tool { padding: 8px 16px; border-radius: 12px; border: none; font-weight: 700; font-family: 'Fredoka', sans-serif; cursor: pointer; color: white; font-size: 14px; }
+    .btn-borrar { background: var(--accent-red); }
+    .btn-listo { background: var(--accent-green); color: #004b39; }
+    
+    .tipo1 { font-family: 'Montserrat', sans-serif; }
+    .tipo2 { font-family: 'Caveat', cursive; }
+    .tipo3 { font-family: 'Courier Prime', monospace; }
+    .tipo4 { font-family: 'Pacifico', cursive; }
+
+    /* 🤖 ESTILOS DE LA MASCOTA FLOTANTE */
+    .mascota-wrapper {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    .globo-mascota {
+      background: #ffffff;
+      color: #2d3436;
+      border: 3px solid var(--primary);
+      border-radius: 16px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      max-width: 180px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+      margin-bottom: 6px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(10px) scale(0.9);
+      transition: all 0.25s ease;
+      pointer-events: auto;
+      text-align: center;
+    }
+    .globo-mascota.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .globo-mascota::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      right: 30px;
+      border-width: 10px 8px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+    .globo-mascota::before {
+      content: '';
+      position: absolute;
+      bottom: -14px;
+      right: 28px;
+      border-width: 12px 10px 0;
+      border-style: solid;
+      border-color: var(--primary) transparent;
+      display: block;
+      width: 0;
+    }
+    .svg-mascota-box {
+      width: 85px;
+      height: 95px;
+      cursor: pointer;
+      pointer-events: auto;
+      filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.3));
+      animation: flotarMascota 3s ease-in-out infinite;
+      transition: transform 0.15s ease;
+    }
+    .svg-mascota-box:active {
+      transform: scale(0.95);
+    }
+    .svg-mascota-box.hablando {
+      animation: hablarMascota 0.35s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes flotarMascota {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+    @keyframes hablarMascota {
+      0% { transform: translateY(-4px) scale(1) rotate(-1deg); }
+      100% { transform: translateY(-12px) scale(1.06) rotate(2deg); }
+    }
+
+    @keyframes pop { 0% { transform: scale(0.5); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+<!-- COMPONENTE FLOTANTE DE MASCOTA ROBLOX VECTORIAL LIMPIA Y DEFINIDA -->
+<div class="mascota-wrapper">
+  <div id="globoMascota" class="globo-mascota">¡Hola! Vamos a jugar</div>
+  <div id="mascotaAvatar" class="svg-mascota-box" onclick="repetirAudioInstruccion()">
+    <svg viewBox="0 0 100 120" width="100%" height="100%">
+      <ellipse cx="50" cy="115" rx="30" ry="4" fill="rgba(0,0,0,0.2)" />
+      <rect x="8" y="58" width="16" height="32" rx="4" fill="#FFD000" stroke="#1E272C" stroke-width="2.5" transform="rotate(12 16 74)" />
+      <rect x="76" y="58" width="16" height="32" rx="4" fill="#FFD000" stroke="#1E272C" stroke-width="2.5" transform="rotate(-12 84 74)" />
+      <rect x="28" y="88" width="20" height="24" rx="3" fill="#1E90FF" stroke="#1E272C" stroke-width="2.5" />
+      <rect x="52" y="88" width="20" height="24" rx="3" fill="#1E90FF" stroke="#1E272C" stroke-width="2.5" />
+      <rect x="24" y="52" width="52" height="38" rx="5" fill="#FF4757" stroke="#1E272C" stroke-width="2.5" />
+      <path d="M 40 52 L 50 64 L 60 52 Z" fill="#D63031" stroke="#1E272C" stroke-width="1.5" />
+      <rect x="36" y="74" width="28" height="12" rx="3" fill="#D63031" stroke="#1E272C" stroke-width="1.5" />
+      <rect x="25" y="16" width="50" height="40" rx="8" fill="#FFD000" stroke="#1E272C" stroke-width="2.5" />
+      <ellipse cx="40" cy="32" rx="3.5" ry="6" fill="#1E272C" />
+      <ellipse cx="60" cy="32" rx="3.5" ry="6" fill="#1E272C" />
+      <circle cx="39" cy="30" r="1.2" fill="#FFFFFF" />
+      <circle cx="59" cy="30" r="1.2" fill="#FFFFFF" />
+      <path d="M 40 43 Q 50 51 60 43" fill="none" stroke="#1E272C" stroke-width="3" stroke-linecap="round" />
+      <path d="M 21 20 C 21 6 79 6 79 20 Z" fill="#FF4757" stroke="#1E272C" stroke-width="2.5" />
+      <path d="M 16 21 C 16 21 40 27 84 21 L 80 25 C 80 25 45 30 18 25 Z" fill="#2D3436" stroke="#1E272C" stroke-width="1.5" />
+    </svg>
+  </div>
+</div>
+
+  <div class="app-container">
+  
+      
+      
+    
+    <!-- MODAL LOGRO DESBLOQUEADO -->
+    <div id="modalLogro" class="modal-logro">
+      <div class="modal-content">
+        <div style="font-size: 50px;" id="modalLogroIcono">🏆</div>
+        <h2 style="color: var(--primary); margin: 5px 0;">¡Nuevo Logro!</h2>
+        <h3 id="modalLogroTitulo" style="color: #2d3436; margin: 5px 0;">-</h3>
+        <p id="modalLogroDesc" style="font-size: 20px; color: #636e72;">-</p>
+        <button class="btn-menu btn-guardar" onclick="cerrarModalLogro()">¡Genial! 🚀</button>
+      </div>
+    </div>
+
+    <div class="top-header">
+      <h1>🎈 Kiddo ABC</h1>
+      <div class="header-btns">
+        <button class="btn-icon" onclick="toggleMusica()" id="btnMusica">🎵 ON</button>
+        <button class="btn-icon" onclick="cambiarPantalla('pantallaConfig')">⚙️</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA 1: MENÚ PRINCIPAL 3 ÁREAS -->
+    <div id="pantallaMenu" class="pantalla activa">
+      
+      <!-- BARRA DE GESTIÓN DE PERFIL ACTIVO -->
+      <div class="profile-bar">
+        <div class="profile-info">
+          <span>👤 Perfil:</span>
+          <span id="nombrePerfilActivo">Jugador Principal</span>
+        </div>
+        <button class="btn-perfil-selector" onclick="cambiarPantalla('pantallaPerfiles')">⚙️ Cambiar / Crear</button>
+      </div>
+
+      <div class="menu-areas">
+        
+        <!-- ÁREA 1: PRÁCTICA LIBRE -->
+        <div class="card-area area-libre" onclick="toggleArea('subLibre')">
+          <h2>🟢 1. Práctica Libre</h2>
+          <p>Aprende a tu ritmo sin presión de tiempo</p>
+          <div id="subLibre" class="sub-menu" onclick="event.stopPropagation()">
+            <button class="btn-sub" onclick="prepararJuego('libre', 'letras')">🔤 Búsqueda de Letras <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('libre', 'escritura')">✍️ Escritura de Palabras <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('libre', 'imagenes')">🖼️ Explorador de Imágenes <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('libre', 'caligrafia')">🖌️ Pincel Mágico / Caligrafía <span>➡️</span></button>
+   
+   </div>
+        </div>
+        
+        <!-- ÁREA 2: MODO RETO -->
+        <div class="card-area area-reto" onclick="toggleArea('subReto')">
+          <h2>🟡 2. Modo Reto</h2>
+          <p>¡Ponte a prueba contra el reloj!</p>
+          <div id="subReto" class="sub-menu" onclick="event.stopPropagation()">
+            <button class="btn-sub" onclick="prepararJuego('reto', 'letras')">⏱️ Reto de Letras <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('reto', 'escritura')">⏱️ Reto de Escritura <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('reto', 'imagenes')">⏱️ Reto de Imágenes <span>➡️</span></button>
+            <button class="btn-sub" onclick="prepararJuego('reto', 'caligrafia')">⏱️ Reto de Caligrafía <span>➡️</span></button>
+          </div>
+        </div>
+
+        <!-- ÁREA 3: MODO QUIZZ -->
+        <div class="card-area area-quizz" onclick="toggleArea('subQuizz')">
+          <h2>🔴 3. Modo Quizz</h2>
+          <p>Demuestra todo lo que has aprendido</p>
+          <div id="subQuizz" class="sub-menu" onclick="event.stopPropagation()">
+            <button class="btn-sub" onclick="iniciarQuizDirecto('letras')">🧩 Quizz de Letras <span>➡️</span></button>
+            <button class="btn-sub" onclick="iniciarQuizDirecto('escritura')">📝 Quizz de Escritura <span>➡️</span></button>
+            <button class="btn-sub" onclick="iniciarQuizDirecto('imagenes')">🖼️ Quizz de Imágenes <span>➡️</span></button>
+            <button class="btn-sub" onclick="iniciarQuizDirecto('caligrafia')">🖌️ Quizz de Caligrafía <span>➡️</span></button>
+            <button class="btn-sub" style="background: #ffeaa7; color: #d35400;" onclick="iniciarQuizDirecto('mixto')">🏆 Quizz Mixto (Combinado) <span>⭐</span></button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
+        <button class="btn-menu" style="background: #fdcb6e; color: #d35400;" onclick="mostrarPerfil()">🏅 Mi Progreso</button>
+      </div>
+
+      <div class="leaderboard">
+        <h3>🏆 Mejores Puntajes de este Perfil</h3>
+        <div id="listaPuntajes"><p style="font-size: 12px; color: #b2bec3;">Sin puntajes aún</p></div>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE GESTIÓN DE PERFILES -->
+    <div id="pantallaPerfiles" class="pantalla">
+      <h1>👥 Perfiles de Jugador</h1>
+      <p style="font-size: 14px; margin: 0; color: #636e72;">Selecciona un perfil o crea uno nuevo para separar tus progresos:</p>
+      
+      <div id="listaPerfilesContenedor" class="lista-perfiles"></div>
+
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+        <input type="text" id="nuevoNombrePerfil" class="input-nombre" placeholder="Nombre de Perfil Nuevo" maxlength="15" style="width: 100%; margin-bottom: 0;" />
+        <button class="btn-menu btn-guardar" onclick="crearNuevoPerfil()">➕ Crear Perfil</button>
+      </div>
+      
+      <button class="btn-menu btn-volver" onclick="irAlMenu()">⬅️ Volver al Menú</button>
+    </div>
+
+    <!-- PANTALLA PERFIL Y LOGROS -->
+    <div id="pantallaPerfil" class="pantalla">
+      <h1>🏅 Mi Progreso</h1>
+      <div class="perfil-card">
+        <div id="nivelJugadorBadge" class="nivel-badge">Nivel: Principiante</div>
+        <h4 style="margin: 5px 0 10px 0;">Medallas y Logros:</h4>
+        <div id="gridLogros" class="grid-logros"></div>
+        <h4 style="margin: 15px 0 5px 0;">Dominio de Letras:</h4>
+        <div id="gridDominioLetras" class="grid-letras-dominio"></div>
+      </div>
+      <button class="btn-menu btn-volver" onclick="irAlMenu()">⬅️ Volver al Menú</button>
+    </div>
+
+    <!-- PANTALLA CONFIGURACIÓN UNIFICADA -->
+    <div id="pantallaConfig" class="pantalla">
+      <h1>⚙️ Ajustes</h1>
+      <div class="form-config">
+        <div class="config-group">
+          <label class="config-checkbox">
+            <input type="checkbox" id="cfgModoGamer">
+            <span>🎮 Modo Comentarios Gamer (Incentivo)</span>
+          </label>
+        </div>
+        
+        <div class="config-group">
+          <label for="cfgTamanoTrazo">✏️ Tamaño de Trazo en Caligrafía:</label>
+          <select id="cfgTamanoTrazo">
+            <option value="chico">Chico (Fino)</option>
+            <option value="mediano" selected>Mediano (Estándar)</option>
+            <option value="grande">Grande (Grueso)</option>
+          </select>
+        </div>
+
+        <div class="config-group">
+          <label for="cfgTamanoLetra">📏 Tamaño de Letras / Fichas:</label>
+          <select id="cfgTamanoLetra">
+            <option value="pequeno">Pequeño</option>
+            <option value="normal" selected>Normal / Estándar</option>
+            <option value="grande">Grande</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgFormatoLetras">🔤 Formato de Letras en Tablero:</label>
+          <select id="cfgFormatoLetras">
+            <option value="mayusculas">Solo MAYÚSCULAS</option>
+            <option value="minusculas">Solo minúsculas</option>
+            <option value="mixto" selected>Mixto (Mayúsculas y Minúsculas)</option>
+          </select>
+        </div>
+
+        <div class="config-group">
+          <label for="cfgCantidadImagenesGrid">🖼️ Imágenes mostradas en Rejilla:</label>
+          <select id="cfgCantidadImagenesGrid">
+            <option value="4">4 Imágenes (2x2)</option>
+            <option value="6" selected>6 Imágenes (3x2)</option>
+            <option value="8">8 Imágenes (4x2)</option>
+            <option value="10">10 Imágenes (5x2)</option>
+            <option value="12">12 Imágenes (4x3)</option>
+          </select>
+        </div>
+
+        <div class="config-group">
+          <label for="cfgCantidadTablero">🎮 Cantidad de letras en tablero (Libre):</label>
+          <select id="cfgCantidadTablero">
+            <option value="12">12 letras (Fácil)</option>
+            <option value="20" selected>20 letras (Estándar)</option>
+            <option value="30">30 letras (Desafío alto)</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgCantidadPalabrasEscritura">✍️ Cantidad de palabras a escribir:</label>
+          <select id="cfgCantidadPalabrasEscritura">
+            <option value="3">3 Palabras</option>
+            <option value="5" selected>5 Palabras</option>
+            <option value="10">10 Palabras</option>
+            <option value="15">15 Palabras</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgRondasImagenes">🖼️ Cantidad de imágenes a reconocer (Rondas):</label>
+          <select id="cfgRondasImagenes">
+            <option value="3">3 Rondas (Rápido)</option>
+            <option value="5" selected>5 Rondas (Estándar)</option>
+            <option value="10">10 Rondas (Desafío)</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgPreguntasQuiz">🧩 Cantidad de preguntas en Modo Quizz:</label>
+          <select id="cfgPreguntasQuiz">
+            <option value="5">5 Preguntas</option>
+            <option value="10" selected>10 Preguntas</option>
+            <option value="15">15 Preguntas</option>
+            <option value="20">20 Preguntas</option>
+            <option value="30">30 Preguntas (Máximo)</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgDificultadEscritura">✍️ Dificultad Modo Escritura (Longitud):</label>
+          <select id="cfgDificultadEscritura">
+            <option value="facil" selected>Fácil (3-4 letras)</option>
+            <option value="medio">Medio (5-6 letras)</option>
+            <option value="dificil">Difícil (7-8 letras)</option>
+            <option value="experto">Experto (9+ letras)</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgTiempoDesafio">⏱️ Tiempo en Modo Reto / Desafío:</label>
+          <select id="cfgTiempoDesafio">
+            <option value="10">10 Segundos</option>
+            <option value="15" selected>15 Segundos</option>
+            <option value="25">25 Segundos</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="cfgTiempoQuiz">⏳ Tiempo total en Modo Quizz:</label>
+          <select id="cfgTiempoQuiz">
+            <option value="30">30 Segundos</option>
+            <option value="60" selected>60 Segundos (1 min)</option>
+            <option value="120">120 Segundos (2 min)</option>
+            <option value="180">180 Segundos (3 min)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-menu btn-guardar" onclick="guardarConfiguracion()">💾 Guardar y Volver</button>
+    </div>
+
+    <!-- PANTALLA 3: TABLERO DE JUEGO (LETRAS / QUIZZ / IMÁGENES) -->
+    <div id="pantallaJuego" class="pantalla">
+      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+        <button class="btn-menu btn-volver" onclick="irAlMenu()">🏠 Menú</button>
+        <button class="btn-audio" onclick="repetirAudioInstruccion()">🔊 Escuchar</button>
+        <div class="selector-box" id="boxSelector">
+          <label for="miSeleccion">Letra:</label>
+          <select id="miSeleccion" onchange="iniciarJuegoLibre()"></select>
+        </div>
+      </div>
+      <div class="hud-panel">
+        <div id="tiempoDiv" class="tiempo"></div>
+        <div id="mensaje" class="mensaje"></div>
+      </div>
+      <div id="tablero"></div>
+    </div>
+
+    <!-- PANTALLA 4: MODO ESCRITURA DE PALABRAS -->
+    <div id="pantallaEscritura" class="pantalla">
+      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+        <button class="btn-menu btn-volver" onclick="irAlMenu()">🏠 Menú</button>
+        <span style="font-weight: 700; color: var(--accent-orange);" id="contadorPalabras">Palabra 1/5</span>
+      </div>
+      <div id="emojiDisplay" class="emoji-palabra" onclick="decirTexto(palabraObjetivoObj.palabra)">☀️</div>
+      <div class="mensaje" id="mensajeEscritura">Forma la palabra:</div>
+      <div id="casillasPalabra" class="casillas-palabra"></div>
+      <div id="tecladoEscritura" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;"></div>
+    </div>
+
+    <!-- PANTALLA 5: MODO TRAZADO Y CALIGRAFÍA -->
+    <div id="pantallaCaligrafia" class="pantalla">
+      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <button class="btn-menu btn-volver" onclick="irAlMenu()">🏠 Menú</button>
+        <button class="btn-toggle-case" id="btnToggleCase" onclick="alternarMayusculasMinusculasCaligrafia()">🔤 Aa: MAYÚS</button>
+        <button class="btn-audio" onclick="repetirAudioInstruccion()">🔊 Escuchar</button>
+        <div class="selector-box" id="boxSelectorCaligrafia">
+          <label for="miSeleccionCaligrafia">Letra/Modo:</label>
+          <select id="miSeleccionCaligrafia" onchange="iniciarCaligrafiaLibre()"></select>
+        </div>
+      </div>
+      <div class="hud-panel">
+        <div id="tiempoDivCaligrafia" class="tiempo"></div>
+        <div id="mensajeCaligrafia" class="mensaje">Traza la plantilla punteada:</div>
+      </div>
+      
+      <div class="canvas-container" id="containerCanvasCaligrafia">
+        <canvas id="canvasTrazado" width="300" height="260"></canvas>
+      </div>
+      
+      <div class="canvas-tools">
+        <button class="btn-tool btn-borrar" onclick="limpiarCanvas()">🧹 Limpiar</button>
+        <button class="btn-tool btn-listo" onclick="confirmarTrazoCaligrafia()">⭐ ¡Listo!</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const abecedario = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const estilos = ['tipo1', 'tipo2', 'tipo3', 'tipo4'];
+
+    const frasesGamerEspeciales = {
+      fail: ["Jaja que Boot","El noob","Buu saquenlo","Que Boot", "Vaya Noob", "Mira un NPC", "Que bootsito","Pal loby"],
+      success: ["Vaya un Pro", "Woou cuánta aura", "+ 1000 de aura", "Andas prime","God","Se ve que si le sabes","Si le sabes","La rompiste"]
+    };
+    
+    const frasesPedagogicas = {
+      fail: ["Sigue practicando","Buen intento","Ánimo, tu puedes","Ya casi lo tienes"],
+      success: ["Excelente trabajo","Bien hecho","Muy bien","Felicidades","Lo lograste"]
+    };
+
+    const catalogoObjetos = [
+      { palabra: 'CARRO', emoji: '🚗', letra: 'C' }, 
+      { palabra: 'MOTOCICLETA', emoji: '🏍️', letra: 'M' },
+      { palabra: 'ANCLA', emoji: '⚓', letra: 'A' },
+      { palabra: 'BICICLETA', emoji: '🚲', letra: 'B' }, 
+      { palabra: 'PATRULLA', emoji: '🚔', letra: 'P' },
+      { palabra: 'AVION', emoji: '✈️', letra: 'A' }, 
+      { palabra: 'RESBALADILLA', emoji: '🛝', letra: 'R' },
+      { palabra: 'CIRCO', emoji: '🎪', letra: 'C' }, 
+      { palabra: 'ESTADIO', emoji: '🏟️', letra: 'E' },
+      { palabra: 'COHETE', emoji: '🚀', letra: 'C' }, 
+      { palabra: 'OVNI', emoji: '🛸', letra: 'O' },
+      { palabra: 'HELICOPTERO', emoji: '🚁', letra: 'H' },
+      { palabra: 'VELERO', emoji: '⛵', letra: 'V' },
+      { palabra: 'LANCHA', emoji: '🚤', letra: 'L' }, 
+      { palabra: 'TREN', emoji: '🚂', letra: 'T' },
+      { palabra: 'MOTOTAXI', emoji: '🛺', letra: 'M' }, 
+      { palabra: 'TRACTOR', emoji: '🚜', letra: 'T' },
+      { palabra: 'AUTOBUS', emoji: '🚌', letra: 'A' }, 
+      { palabra: 'PATIN', emoji: '🛴', letra: 'P' }, 
+      { palabra: 'TELEFERICO', emoji: '🚡', letra: 'T' },
+      { palabra: 'SATELITE', emoji: '🛰️', letra: 'S' },
+      { palabra: 'CRUCERO', emoji: '🚢', letra: 'C' }, 
+      { palabra: 'CANOA', emoji: '🛶', letra: 'C' },
+      { palabra: 'MOTONETA', emoji: '🛵', letra: 'M' }, 
+      { palabra: 'VOLCAN', emoji: '🌋', letra: 'V' },
+      { palabra: 'MONTAÑA', emoji: '⛰️', letra: 'M' }, 
+      { palabra: 'GIRASOL', emoji: '🌻', letra: 'G' },
+      { palabra: 'HOJA', emoji: '🍂', letra: 'H' },
+      { palabra: 'HONGO', emoji: '🍄', letra: 'H' }, 
+      { palabra: 'TRIGO', emoji: '🌾', letra: 'T' },
+      { palabra: 'SOL', emoji: '☀️', letra: 'S' }, 
+      { palabra: 'LUNA', emoji: '🌙', letra: 'L' },
+      { palabra: 'ESTRELLA', emoji: '⭐', letra: 'E' }, 
+      { palabra: 'NUBE', emoji: '☁️', letra: 'N' },
+      { palabra: 'RAYO', emoji: '⚡', letra: 'R' }, 
+      { palabra: 'ARCOIRIS', emoji: '🌈', letra: 'A' },
+      { palabra: 'NIEVE', emoji: '❄️', letra: 'N' }, 
+      { palabra: 'VIENTO', emoji: '🌬️', letra: 'V' },
+      { palabra: 'ISLA', emoji: '🏝️', letra: 'I' },
+      { palabra: 'PLAYA', emoji: '🏖️', letra: 'P' }, 
+      { palabra: 'DESIERTO', emoji: '🏜️', letra: 'D' },
+      { palabra: 'CAMPAMENTO', emoji: '🏕️', letra: 'C' }, 
+      { palabra: 'PIEDRA', emoji: '🪨', letra: 'P' },
+      { palabra: 'MEDALLA', emoji: '🥇', letra: 'M' },
+      { palabra: 'MUSEO', emoji: '🏛️', letra: 'M' }, 
+      { palabra: 'TEATRO', emoji: '🎭', letra: 'T' },
+      { palabra: 'IGLESIA', emoji: '⛪', letra: 'I' }, 
+      { palabra: 'CASTILLO', emoji: '🏰', letra: 'C' },
+      { palabra: 'TORRE', emoji: '🗼', letra: 'T' }, 
+      { palabra: 'PUENTE', emoji: '🌉', letra: 'P' },
+      { palabra: 'EDIFICIO', emoji: '🏢', letra: 'E' }, 
+      { palabra: 'HOTEL', emoji: '🏨', letra: 'H' },
+      { palabra: 'HOSPITAL', emoji: '🏥', letra: 'H' }, 
+      { palabra: 'TIENDA', emoji: '🏪', letra: 'T' },
+      { palabra: 'MERCADO', emoji: '🏬', letra: 'M' }, 
+      { palabra: 'BANCO', emoji: '🏦', letra: 'B' },
+      { palabra: 'PASTILLA', emoji: '💊', letra: 'P' }, 
+      { palabra: 'CUBIERTOS', emoji: '🍽️', letra: 'C' },
+      { palabra: 'SARTEN', emoji: '🍳', letra: 'S' }, 
+      { palabra: 'CAMA', emoji: '🛏️', letra: 'C' },
+      { palabra: 'PUERTA', emoji: '🚪', letra: 'P' }, 
+      { palabra: 'VENTANA', emoji: '🪟', letra: 'V' },
+      { palabra: 'ESPEJO', emoji: '🪞', letra: 'E' },
+      { palabra: 'FOCO', emoji: '💡', letra: 'F' }, 
+      { palabra: 'CUADRO', emoji: '🖼️', letra: 'C' },
+      { palabra: 'LIBRO', emoji: '📖', letra: 'L' }, 
+      { palabra: 'MAPA', emoji: '🗺️', letra: 'M' },
+      { palabra: 'BRUJULA', emoji: '🧭', letra: 'B' }, 
+      { palabra: 'TIJERAS', emoji: '✂️', letra: 'T' },
+      { palabra: 'BALON', emoji: '⚽', letra: 'B' }, 
+      { palabra: 'BATE', emoji: '🏏', letra: 'B' },
+      { palabra: 'RAQUETA', emoji: '🎾', letra: 'R' }, 
+      { palabra: 'CORONA', emoji: '👑', letra: 'C' }, 
+      { palabra: 'ROBOT', emoji: '🤖', letra: 'R' }, 
+      { palabra: 'BOMBA', emoji: '💣', letra: 'B' },
+      { palabra: 'CANDADO', emoji: '🔒', letra: 'C' }, 
+      { palabra: 'LLAVE', emoji: '🔑', letra: 'L' },
+      { palabra: 'TIERRA', emoji: '🌍', letra: 'T' }, 
+      { palabra: 'POLAR', emoji: '🐻‍❄️', letra: 'O' },
+      { palabra: 'DRAGON', emoji: '🐉', letra: 'D' },   
+      { palabra: 'VACA', emoji: '🐄', letra: 'V' }, 
+      { palabra: 'TORO', emoji: '🐂', letra: 'T' },
+      { palabra: 'OVEJA', emoji: '🐑', letra: 'O' }, 
+      { palabra: 'LLAMA', emoji: '🦙', letra: 'L' },
+      { palabra: 'CANGURO', emoji: '🦘', letra: 'C' }, 
+      { palabra: 'CEBRA', emoji: 'ZEBRA', letra: 'C' },
+      { palabra: 'MAMUT', emoji: '🦣', letra: 'M' }, 
+      { palabra: 'RINOCERONTE', emoji: '🦏', letra: 'R' },
+      { palabra: 'HIPOPOTAMO', emoji: '🦛', letra: 'H' }, 
+      { palabra: 'JIRAFA', emoji: '🦒', letra: 'J' },
+      { palabra: 'GORILA', emoji: '🦍', letra: 'G' }, 
+      { palabra: 'CAMELLO', emoji: '🐫', letra: 'C' },
+      { palabra: 'DROMEDARIO', emoji: '🐪', letra: 'D' }, 
+      { palabra: 'MURCIELAGO', emoji: '🦇', letra: 'M' },
+      { palabra: 'GALLO', emoji: '🐓', letra: 'G' }, 
+      { palabra: 'POLLO', emoji: '🐥', letra: 'P' },
+      { palabra: 'PERICO', emoji: '🦜', letra: 'P' }, 
+      { palabra: 'BUHO', emoji: '🦉', letra: 'B' },
+      { palabra: 'ABRIGO', emoji: '🧥', letra: 'A' },
+      { palabra: 'ACORDEON', emoji: '🪗', letra: 'A' },
+      { palabra: 'AGUACATE', emoji: '🥑', letra: 'A' },
+      { palabra: 'AGUA', emoji: '💦', letra: 'A' },
+      { palabra: 'AGUJA', emoji: '🪡', letra: 'A' },
+      { palabra: 'AGUILA', emoji: '🦅', letra: 'A' },
+      { palabra: 'AJO', emoji: '🧄', letra: 'A' },
+      { palabra: 'ALA', emoji: '🪽', letra: 'A' },
+      { palabra: 'ALCE', emoji: '🫎', letra: 'A' },
+      { palabra: 'ANTENA', emoji: '📡', letra: 'A' },
+      { palabra: 'ARCO', emoji: '🏹', letra: 'A' },
+      { palabra: 'ARDILLA', emoji: '🐿️', letra: 'A' },
+      { palabra: 'ARTE', emoji: '🎨', letra: 'A' },
+      { palabra: 'ARROZ', emoji: '🍚', letra: 'A' },
+      { palabra: 'AUDIFONOS', emoji: '🎧', letra: 'A' },
+      { palabra: 'BALLET', emoji: '🩰', letra: 'B' },
+      { palabra: 'BALLENA', emoji: '🐋', letra: 'B' },
+      { palabra: 'BAMBU', emoji: '🎍', letra: 'B' },
+      { palabra: 'BANJO', emoji: '🪕', letra: 'B' },
+      { palabra: 'BATA', emoji: '🥼', letra: 'B' },
+      { palabra: 'BATERIA', emoji: '🪫', letra: 'B' },
+      { palabra: 'BESO', emoji: '💋', letra: 'B' },
+      { palabra: 'BIBERON', emoji: '🍼', letra: 'B' },
+      { palabra: 'BILLETE', emoji: '💵', letra: 'B' },
+      { palabra: 'BISONTE', emoji: '🦬', letra: 'B' },
+      { palabra: 'BLUSA', emoji: '👚', letra: 'B' },
+      { palabra: 'BOLIGRAFO', emoji: '🖊️', letra: 'B' },
+      { palabra: 'BOLOS', emoji: '🎳', letra: 'B' },
+      { palabra: 'BOLSO', emoji: '👜', letra: 'B' },
+      { palabra: 'BOTA', emoji: '🥾', letra: 'B' },
+      { palabra: 'BROCOLI', emoji: '🥦', letra: 'B' },
+      { palabra: 'BROTE', emoji: '🌱', letra: 'B' },
+      { palabra: 'BUFALO', emoji: '🐃', letra: 'B' },
+      { palabra: 'BUFANDA', emoji: '🧣', letra: 'B' },
+      { palabra: 'BURRO', emoji: '🫏', letra: 'B' },
+      { palabra: 'BURRITO', emoji: '🌯', letra: 'B' },
+      { palabra: 'CABALLO', emoji: '🐎', letra: 'C' },
+      { palabra: 'CABRA', emoji: '🐐', letra: 'C' },
+      { palabra: 'CACAHUATE', emoji: '🥜', letra: 'C' },
+      { palabra: 'CACTUS', emoji: '🌵', letra: 'C' },
+      { palabra: 'CAFE', emoji: '☕', letra: 'C' },
+      { palabra: 'CALABAZA', emoji: '🎃', letra: 'C' },
+      { palabra: 'CALAMAR', emoji: '🦑', letra: 'C' },
+      { palabra: 'CALCETIN', emoji: '🧦', letra: 'C' },
+      { palabra: 'CAMARA', emoji: '📷', letra: 'C' },
+      { palabra: 'CAMARON', emoji: '🍤', letra: 'C' },
+      { palabra: 'CAMISETA', emoji: '👕', letra: 'C' },
+      { palabra: 'CANGREJO', emoji: '🦀', letra: 'C' },
+      { palabra: 'CARACOL', emoji: '🐌', letra: 'C' },
+      { palabra: 'CARAMELO', emoji: '🍬', letra: 'C' },
+      { palabra: 'CARNE', emoji: '🥩', letra: 'C' },
+      { palabra: 'CARNERO', emoji: '🐏', letra: 'C' },
+      { palabra: 'CASCO', emoji: '🪖', letra: 'C' },
+      { palabra: 'CASTOR', emoji: '🦫', letra: 'C' },
+      { palabra: 'CEREBRO', emoji: '🧠', letra: 'C' },
+      { palabra: 'CEREZA', emoji: '🍒', letra: 'C' },
+      { palabra: 'CERDO', emoji: '🐖', letra: 'C' },
+      { palabra: 'CHALECO', emoji: '🦺', letra: 'C' },
+      { palabra: 'CHANCLA', emoji: '🩴', letra: 'C' },
+      { palabra: 'CHILE', emoji: '🌶️', letra: 'C' },
+      { palabra: 'CHOCOLATE', emoji: '🍫', letra: 'C' },
+      { palabra: 'CIERVO', emoji: '🦌', letra: 'C' },
+      { palabra: 'CINE', emoji: '🎬', letra: 'C' },
+      { palabra: 'CISNE', emoji: '🦢', letra: 'C' },
+      { palabra: 'COCO', emoji: '🥥', letra: 'C' },
+      { palabra: 'COCODRILO', emoji: '🐊', letra: 'C' },
+      { palabra: 'CONEJO', emoji: '🐇', letra: 'C' },
+      { palabra: 'CONGELADO', emoji: '🥶', letra: 'C' },
+      { palabra: 'CORAZON', emoji: '🫀', letra: 'C' },
+      { palabra: 'CRAYON', emoji: '🖍️', letra: 'C' },
+      { palabra: 'CUERNO', emoji: '🥐', letra: 'C' },
+      { palabra: 'CUCHARA', emoji: '🥄', letra: 'C' },
+      { palabra: 'CUERVO', emoji: '🐦‍⬛', letra: 'C' },
+      { palabra: 'DADO', emoji: '🎲', letra: 'D' },
+      { palabra: 'DELFIN', emoji: '🐬', letra: 'D' },
+      { palabra: 'DESPERTADOR', emoji: '⏰', letra: 'D' },
+      { palabra: 'DIANA', emoji: '🎯', letra: 'D' },
+      { palabra: 'DIAMANTE', emoji: '💎', letra: 'D' },
+      { palabra: 'DIENTE', emoji: '🦷', letra: 'D' },
+      { palabra: 'DINERO', emoji: '💰', letra: 'D' },
+      { palabra: 'DINOSAURIO', emoji: '🦖', letra: 'D' },
+      { palabra: 'DODO', emoji: '🦤', letra: 'D' },
+      { palabra: 'DONA', emoji: '🍩', letra: 'D' },
+      { palabra: 'DURAZNO', emoji: '🍑', letra: 'D' },
+      { palabra: 'ELEFANTE', emoji: '🐘', letra: 'E' },
+      { palabra: 'ENGRANAJE', emoji: '⚙️', letra: 'E' },
+      { palabra: 'ENSALADA', emoji: '🥗', letra: 'E' },
+      { palabra: 'ENTRADA', emoji: '🎟️', letra: 'E' },
+      { palabra: 'ERIZO', emoji: '🦔', letra: 'E' },
+      { palabra: 'ESCARABAJO', emoji: '🪲', letra: 'E' },
+      { palabra: 'ESCORPION', emoji: '🦂', letra: 'E' },
+      { palabra: 'ESPAGUETI', emoji: '🍝', letra: 'E' },
+      { palabra: 'ESPONJA', emoji: '🧽', letra: 'E' },
+      { palabra: 'EXTINTOR', emoji: '🧯', letra: 'E' },
+      { palabra: 'FANTASMA', emoji: '👻', letra: 'F' },
+      { palabra: 'FLAMENCO', emoji: '🦩', letra: 'F' },
+      { palabra: 'FLAN', emoji: '🍮', letra: 'F' },
+      { palabra: 'FLAUTA', emoji: '🪈', letra: 'F' },
+      { palabra: 'FLOR', emoji: '🌺', letra: 'F' },
+      { palabra: 'FOCA', emoji: '🦭', letra: 'F' },
+      { palabra: 'FORTUNA', emoji: '🥠', letra: 'F' },
+      { palabra: 'FUENTE', emoji: '⛲', letra: 'F' },
+      { palabra: 'GAFAS', emoji: '🥽', letra: 'G' },
+      { palabra: 'GALLETA', emoji: '🍪', letra: 'G' },
+      { palabra: 'GALLINA', emoji: '🐔', letra: 'G' },
+      { palabra: 'GANSO', emoji: '🪿', letra: 'G' },
+      { palabra: 'GATO', emoji: '🐈', letra: 'G' },
+      { palabra: 'GLOBO', emoji: '🎈', letra: 'G' },
+      { palabra: 'WAFFLE', emoji: '🧇', letra: 'W' },
+      { palabra: 'GORRA', emoji: '🧢', letra: 'G' },
+      { palabra: 'GOTA', emoji: '💧', letra: 'G' },
+      { palabra: 'GRILLO', emoji: '🦗', letra: 'G' },
+      { palabra: 'GUANTE', emoji: '🧤', letra: 'G' },
+      { palabra: 'GUISO', emoji: '🥘', letra: 'G' },
+      { palabra: 'GUITARRA', emoji: '🎸', letra: 'G' },
+      { palabra: 'GUSANO', emoji: '🪱', letra: 'G' },
+      { palabra: 'HACHA', emoji: '🪓', letra: 'H' },
+      { palabra: 'HAMSTER', emoji: '🐹', letra: 'H' },
+      { palabra: 'HELADO', emoji: '🍦', letra: 'H' },
+      { palabra: 'HERRAMIENTAS', emoji: '🛠️', letra: 'H' },
+      { palabra: 'HIELO', emoji: '🧊', letra: 'H' },
+      { palabra: 'HIERBA', emoji: '🌿', letra: 'H' },
+      { palabra: 'HILO', emoji: '🧶', letra: 'H' },
+      { palabra: 'HORMIGA', emoji: '🐜', letra: 'H' },
+      { palabra: 'HOTCAKES', emoji: '🥞', letra: 'H' },
+      { palabra: 'HUESO', emoji: '🦴', letra: 'H' },
+      { palabra: 'HUELLAS', emoji: '🐾', letra: 'H' },
+      { palabra: 'HUEVO', emoji: '🥚', letra: 'H' },
+      { palabra: 'NIDO', emoji: '🪺', letra: 'N' },
+      { palabra: 'IMAN', emoji: '🧲', letra: 'I' },
+      { palabra: 'IMPRESORA', emoji: '🖨️', letra: 'I' },
+      { palabra: 'JABALI', emoji: '🐗', letra: 'J' },
+      { palabra: 'KIMONO', emoji: '👘', letra: 'K' },
+      { palabra: 'KIWI', emoji: '🥝', letra: 'K' },
+      { palabra: 'KOALA', emoji: '🐨', letra: 'K' },
+      { palabra: 'LAGARTIJA', emoji: '🦎', letra: 'L' },
+      { palabra: 'LANGOSTA', emoji: '🦞', letra: 'L' },
+      { palabra: 'LATA', emoji: '🥫', letra: 'L' },
+      { palabra: 'LAVANDA', emoji: '🪻', letra: 'L' },
+      { palabra: 'LAZO', emoji: '🎀', letra: 'L' },
+      { palabra: 'LAPIZ', emoji: '✏️', letra: 'L' },
+      { palabra: 'LECHE', emoji: '🥛', letra: 'L' },
+      { palabra: 'LENGUA', emoji: '👅', letra: 'L' },
+      { palabra: 'LENTES', emoji: '👓', letra: 'L' },
+      { palabra: 'LEON', emoji: '🦁', letra: 'L' },
+      { palabra: 'LEOPARDO', emoji: '🐆', letra: 'L' },
+      { palabra: 'LIMA', emoji: '🍋', letra: 'L' },
+      { palabra: 'LIMON', emoji: '🍋‍🟩', letra: 'L' },
+      { palabra: 'LOBO', emoji: '🐺', letra: 'L' },
+      { palabra: 'LLANTA', emoji: '🛞', letra: 'L' },
+      { palabra: 'LLAVE', emoji: '🔧', letra: 'L' },
+      { palabra: 'LORO', emoji: '🦜', letra: 'L' },
+      { palabra: 'MAIZ', emoji: '🌽', letra: 'M' },
+      { palabra: 'MALETA', emoji: '🧳', letra: 'M' },
+      { palabra: 'MANDO', emoji: '🎮', letra: 'M' },
+      { palabra: 'MANGO', emoji: '🥭', letra: 'M' },
+      { palabra: 'MANZANA', emoji: '🍎', letra: 'M' },
+      { palabra: 'MANTEQUILLA', emoji: '🧈', letra: 'M' },
+      { palabra: 'MARACAS', emoji: '🪇', letra: 'M' },
+      { palabra: 'MAPACHE', emoji: '🦝', letra: 'M' },
+      { palabra: 'MARIPOSA', emoji: '🦋', letra: 'M' },
+      { palabra: 'MARIQUITA', emoji: '🐞', letra: 'M' },
+      { palabra: 'MEDUSA', emoji: '🪼', letra: 'M' },
+      { palabra: 'MICROFONO', emoji: '🎤', letra: 'M' },
+      { palabra: 'MIEL', emoji: '🍯', letra: 'M' },
+      { palabra: 'MOCHILA', emoji: '🎒', letra: 'M' },
+      { palabra: 'MONEDA', emoji: '🪙', letra: 'M' },
+      { palabra: 'MONEDERO', emoji: '👛', letra: 'M' },
+      { palabra: 'MONO', emoji: '🐒', letra: 'M' },
+      { palabra: 'MOSCA', emoji: '🪰', letra: 'M' },
+      { palabra: 'MOSQUITO', emoji: '🦟', letra: 'M' },
+      { palabra: 'MUÑECO', emoji: '☃️', letra: 'M' },
+      { palabra: 'MUSICA', emoji: '🎼', letra: 'M' },
+      { palabra: 'NARANJA', emoji: '🍊', letra: 'N' },
+      { palabra: 'NAVIDAD', emoji: '🎄', letra: 'N' },
+      { palabra: 'NIEBLA', emoji: '🌫️', letra: 'N' },
+      { palabra: 'NUDO', emoji: '🪢', letra: 'N' },
+      { palabra: 'NUTRIA', emoji: '🦦', letra: 'N' },
+      { palabra: 'OJO', emoji: '👁️', letra: 'O' },
+      { palabra: 'OLA', emoji: '🌊', letra: 'O' },
+      { palabra: 'ORCA', emoji: '🫍', letra: 'O' },
+      { palabra: 'ORANGUTAN', emoji: '🦧', letra: 'O' },
+      { palabra: 'OREJA', emoji: '👂', letra: 'O' },
+      { palabra: 'ORUGA', emoji: '🐛', letra: 'O' },
+      { palabra: 'OSO', emoji: '🐻', letra: 'O' },
+      { palabra: 'PAJARO', emoji: '🐦', letra: 'P' },
+      { palabra: 'PALOMITAS', emoji: '🍿', letra: 'P' },
+      { palabra: 'PALMERA', emoji: '🌴', letra: 'P' },
+      { palabra: 'PALOMA', emoji: '🕊️', letra: 'P' },
+      { palabra: 'PAN', emoji: '🍞', letra: 'P' },
+      { palabra: 'PANDA', emoji: '🐼', letra: 'P' },
+      { palabra: 'SHORT', emoji: '🩳', letra: 'S' },
+      { palabra: 'PAPEL', emoji: '🧻', letra: 'P' },
+      { palabra: 'PARACAIDAS', emoji: '🪂', letra: 'P' },
+      { palabra: 'PARAGUAS', emoji: '☂️', letra: 'P' },
+      { palabra: 'PASTEL', emoji: '🎂', letra: 'P' },
+      { palabra: 'PATATA', emoji: '🥔', letra: 'P' },
+      { palabra: 'PATATAS', emoji: '🍟', letra: 'P' },
+      { palabra: 'PATO', emoji: '🦆', letra: 'P' },
+      { palabra: 'PAVO', emoji: '🦃', letra: 'P' },
+      { palabra: 'PAVORREAL', emoji: '🦚', letra: 'P' },
+      { palabra: 'PAYASO', emoji: '🤡', letra: 'P' },
+      { palabra: 'PAY', emoji: '🥧', letra: 'P' },
+      { palabra: 'PEPINO', emoji: '🥒', letra: 'P' },
+      { palabra: 'PERA', emoji: '🍐', letra: 'P' },
+      { palabra: 'PEREZOSO', emoji: '🦥', letra: 'P' },
+      { palabra: 'PERRO', emoji: '🐕', letra: 'P' },
+      { palabra: 'PEZ', emoji: '🐠', letra: 'P' },
+      { palabra: 'PIANO', emoji: '🎹', letra: 'P' },
+      { palabra: 'PIES', emoji: '👣', letra: 'P' },
+      { palabra: 'PIMIENTO', emoji: '🫑', letra: 'P' },
+      { palabra: 'PINO', emoji: '🌲', letra: 'P' },
+      { palabra: 'PIÑA', emoji: '🍍', letra: 'P' },
+      { palabra: 'PIÑATA', emoji: '🪅', letra: 'P' },
+      { palabra: 'PALETA', emoji: '🍭', letra: 'P' },
+      { palabra: 'PIZZA', emoji: '🍕', letra: 'P' },
+      { palabra: 'PLANETA', emoji: '🪐', letra: 'P' },
+      { palabra: 'PLATANO', emoji: '🍌', letra: 'P' },
+      { palabra: 'PLUMA', emoji: '🪶', letra: 'P' },
+      { palabra: 'POLLO', emoji: '🍗', letra: 'P' },
+      { palabra: 'PRETZEL', emoji: '🥨', letra: 'P' },
+      { palabra: 'PULPO', emoji: '🐙', letra: 'P' },
+      { palabra: 'PUZZLE', emoji: '🧩', letra: 'P' },
+      { palabra: 'QUESO', emoji: '🧀', letra: 'Q' },
+      { palabra: 'RAMA', emoji: '🪾', letra: 'R' },
+      { palabra: 'RANA', emoji: '🐸', letra: 'R' },
+      { palabra: 'RATON', emoji: '🐭', letra: 'R' },
+      { palabra: 'REBANADA', emoji: '🍰', letra: 'R' },
+      { palabra: 'RELOJ', emoji: '⌚', letra: 'R' },
+      { palabra: 'ROSA', emoji: '🌹', letra: 'R' },
+      { palabra: 'SAL', emoji: '🧂', letra: 'S' },
+      { palabra: 'SALCHICHA', emoji: '🌭', letra: 'S' },
+      { palabra: 'SANDALIA', emoji: '👡', letra: 'S' },
+      { palabra: 'SANDIA', emoji: '🍉', letra: 'S' },
+      { palabra: 'SANDWICH', emoji: '🥪', letra: 'S' },
+      { palabra: 'SAXOFON', emoji: '🎷', letra: 'S' },
+      { palabra: 'SEMAFORO', emoji: '🚦', letra: 'S' },
+      { palabra: 'SERPIENTE', emoji: '🐍', letra: 'S' },
+      { palabra: 'SIERRA', emoji: '🪚', letra: 'S' },
+      { palabra: 'SILLA', emoji: '🪑', letra: 'S' },
+      { palabra: 'SOMBRERO', emoji: '🎩', letra: 'S' },
+      { palabra: 'TACON', emoji: '👠', letra: 'T' },
+      { palabra: 'TAMAL', emoji: '🫔', letra: 'T' },
+      { palabra: 'TAMBOR', emoji: '🪘', letra: 'T' },
+      { palabra: 'TECLADO', emoji: '⌨️', letra: 'T' },
+      { palabra: 'TELARAÑA', emoji: '🕸️', letra: 'T' },
+      { palabra: 'TELEFONO', emoji: '☎️', letra: 'T' },
+      { palabra: 'TETERA', emoji: '🫖', letra: 'T' },
+      { palabra: 'TIBURON', emoji: '🦈', letra: 'T' },
+      { palabra: 'TIEMPO', emoji: '⌛', letra: 'T' },
+      { palabra: 'TIGRE', emoji: '🐅', letra: 'T' },
+      { palabra: 'TOMATE', emoji: '🍅', letra: 'T' },
+      { palabra: 'TORTUGA', emoji: '🐢', letra: 'T' },
+      { palabra: 'TREBOL', emoji: '🍀', letra: 'T' },
+      { palabra: 'TROMPETA', emoji: '🎺', letra: 'T' },
+      { palabra: 'TROFEO', emoji: '🏆', letra: 'T' },
+      { palabra: 'TRONCO', emoji: '🪵', letra: 'T' },
+      { palabra: 'UNICORNIO', emoji: '🦄', letra: 'U' },
+      { palabra: 'UVA', emoji: '🍇', letra: 'U' },
+      { palabra: 'VELA', emoji: '🕯️', letra: 'V' },
+      { palabra: 'VIOLIN', emoji: '🎻', letra: 'V' },
+      { palabra: 'ZAPATO', emoji: '👞', letra: 'Z' },
+      { palabra: 'ZORRO', emoji: '🦊', letra: 'Z' },
+      { palabra: 'ZORRILLO', emoji: '🦨', letra: 'Z' }
+    ];
+
+    const bancoPalabras = {
+      facil: catalogoObjetos.filter(o => o.palabra.length <= 4),
+      medio: catalogoObjetos.filter(o => o.palabra.length >= 5 && o.palabra.length <= 6),
+      dificil: catalogoObjetos.filter(o => o.palabra.length >= 7 && o.palabra.length <= 8),
+      experto: catalogoObjetos.filter(o => o.palabra.length >= 9)
+    };
+    
+    const DEFINICION_LOGROS = [
+      { id: 'palabra_3', titulo: 'Ninguna palabra corta te detiene', desc: 'Escribe correctamente 50 palabras de 3 letras', icono: '🔤' },
+      { id: 'experto_A', titulo: 'Experto en la Letra A', desc: 'Identifica o escribe la letra A 100 veces correctamente', icono: '🌟' },
+      { id: 'experto_E', titulo: 'Experto en la Letra E', desc: 'Identifica o escribe la letra E 100 veces correctamente', icono: '✨' },
+      { id: 'experto_O', titulo: 'Experto en la Letra O', desc: 'Identifica o escribe la letra O 100 veces correctamente', icono: '💫' },
+      { id: 'nivel_intermedio', titulo: 'Dejando de ser un noob', desc: 'Completa 500 actividades correctamente', icono: '🏅' },
+      { id: 'nivel_avanzado', titulo: 'El más Pro', desc: 'Completa 1000 actividades correctamente', icono: '👑' }
+    ];
+
+    let config = JSON.parse(localStorage.getItem('configJuegoLetras')) || {
+      cantidadTablero: 20,
+      dificultadEscritura: 'facil',
+      cantidadPalabrasEscritura: 5,
+      tiempoDesafio: 15,
+      preguntasQuiz: 10,
+      tiempoQuiz: 60,
+      rondasImagenes: 5,
+      tamanoTrazo: 'mediano',
+      cantidadImagenesGrid: 6,
+      modoGamer: false,
+      tamanoLetra: 'normal',
+      formatoLetras: 'mixto'
+    };
+
+    // GESTIÓN DE MULTIPERFILES
+    let listaPerfiles = JSON.parse(localStorage.getItem('listaPerfiles')) || ['Jugador Principal'];
+    let perfilActivo = localStorage.getItem('perfilActivo') || 'Jugador Principal';
+    let dbProgreso = {};
+
+    function cargarProgresoPerfilActual() {
+      dbProgreso = JSON.parse(localStorage.getItem(`dbProgreso_${perfilActivo}`)) || {
+        letrasAcertadas: {},
+        palabras3LetrasCompleta: 0,
+        totalAciertosGlobal: 0,
+        logrosDesbloqueados: []
+      };
+      document.getElementById('nombrePerfilActivo').innerText = perfilActivo;
+    }
+
+    cargarProgresoPerfilActual();
+
+    let modoActual = 'libre', totalCorrectas = 0, encontradas = 0, errores = 0, tiempoRestante = 0, temporizador = null;
+    let nombreJugadorActual = '', rondaQuiz = 0, aciertosQuiz = 0, erroresQuiz = 0, letraObjetivoQuiz = '', tipoQuizActual = 'letras';
+    let indicePalabraActual = 0, palabraObjetivoObj = {}, letrasIngresadas = [], palabrasJuegoActual = [], ultimaFraseAudio = '';
+    let intentosFallidosPalabra = 0, rondaImagenesActual = 0, letraObjetivoImagenes = '', letraObjetivoCaligrafia = 'A';
+    let historialErroresQuiz = [];
+    
+    // ESTADO PARA SWITCH DE MAYÚSCULAS/MINÚSCULAS EN TRAZADO
+    let esMayusculaCaligrafia = true;
+
+    // MOTOR DE MÚSICA AMBIENTAL
+    let audioCtx = null, musicalInterval = null, musicaActiva = false;
+    const notasEscala = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+
+    function toggleMusica() {
+      musicaActiva = !musicaActiva;
+      document.getElementById('btnMusica').innerText = musicaActiva ? '🎵 ON' : '🔇 OFF';
+      if (musicaActiva) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx.resume();
+        reproducirArpegio();
+        musicalInterval = setInterval(reproducirArpegio, 1800);
+      } else {
+        clearInterval(musicalInterval);
+      }
+    }
+
+    function reproducirArpegio() {
+      if (!musicaActiva || !audioCtx) return;
+      const nota = notasEscala[Math.floor(Math.random() * notasEscala.length)];
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(nota, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    }
+
+    function toggleArea(idSub) {
+      document.querySelectorAll('.sub-menu').forEach(sm => {
+        if (sm.id !== idSub) sm.style.display = 'none';
+      });
+      const sub = document.getElementById(idSub);
+      sub.style.display = sub.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // CARGA DE COMBOS Y SELECTORES
+    const combo = document.getElementById('miSeleccion');
+    const comboCaligrafia = document.getElementById('miSeleccionCaligrafia');
+    
+    function popularSelectores() {
+      combo.innerHTML = '';
+      comboCaligrafia.innerHTML = '';
+
+      abecedario.forEach(letra => {
+        const opcion = document.createElement('option');
+        opcion.value = letra.toLowerCase();
+        opcion.innerText = `${letra} / ${letra.toLowerCase()}`;
+        combo.appendChild(opcion);
+
+        const opcionCal = document.createElement('option');
+        const valorLetra = esMayusculaCaligrafia ? letra.toUpperCase() : letra.toLowerCase();
+        opcionCal.value = valorLetra;
+        opcionCal.innerText = `Letra ${valorLetra}`;
+        comboCaligrafia.appendChild(opcionCal);
+      });
+
+      const opcionPalabra = document.createElement('option');
+      opcionPalabra.value = "MODO_PALABRA";
+      opcionPalabra.innerText = "✍️ Modo Palabras (Renglón)";
+      comboCaligrafia.appendChild(opcionPalabra);
+    }
+
+    popularSelectores();
+    cargarInputsConfiguracion();
+    actualizarTablaPuntajes();
+    renderizarListaPerfiles();
+    
+    function cargarInputsConfiguracion() {
+      document.getElementById('cfgCantidadTablero').value = config.cantidadTablero;
+      document.getElementById('cfgCantidadPalabrasEscritura').value = config.cantidadPalabrasEscritura || 5;
+      document.getElementById('cfgDificultadEscritura').value = config.dificultadEscritura;
+      document.getElementById('cfgTiempoDesafio').value = config.tiempoDesafio;
+      document.getElementById('cfgPreguntasQuiz').value = config.preguntasQuiz;
+      document.getElementById('cfgTiempoQuiz').value = config.tiempoQuiz;
+      document.getElementById('cfgRondasImagenes').value = config.rondasImagenes || 5;
+      document.getElementById('cfgTamanoTrazo').value = config.tamanoTrazo || 'mediano';
+      document.getElementById('cfgCantidadImagenesGrid').value = config.cantidadImagenesGrid || 6;
+      document.getElementById('cfgModoGamer').checked = !!config.modoGamer;
+      document.getElementById('cfgTamanoLetra').value = config.tamanoLetra || 'normal';
+      document.getElementById('cfgFormatoLetras').value = config.formatoLetras || 'mixto';
+    }
+
+    function guardarConfiguracion() {
+      config = {
+        cantidadTablero: parseInt(document.getElementById('cfgCantidadTablero').value),
+        cantidadPalabrasEscritura: parseInt(document.getElementById('cfgCantidadPalabrasEscritura').value),
+        dificultadEscritura: document.getElementById('cfgDificultadEscritura').value,
+        tiempoDesafio: parseInt(document.getElementById('cfgTiempoDesafio').value),
+        preguntasQuiz: parseInt(document.getElementById('cfgPreguntasQuiz').value),
+        tiempoQuiz: parseInt(document.getElementById('cfgTiempoQuiz').value),
+        rondasImagenes: parseInt(document.getElementById('cfgRondasImagenes').value),
+        tamanoTrazo: document.getElementById('cfgTamanoTrazo').value,
+        cantidadImagenesGrid: parseInt(document.getElementById('cfgCantidadImagenesGrid').value),
+        modoGamer: document.getElementById('cfgModoGamer').checked,
+        tamanoLetra: document.getElementById('cfgTamanoLetra').value,
+        formatoLetras: document.getElementById('cfgFormatoLetras').value
+      };
+      localStorage.setItem('configJuegoLetras', JSON.stringify(config));
+      decirTexto("Configuración guardada");
+      irAlMenu();
+    }
+
+    function cambiarPantalla(idPantalla) {
+      document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+      document.getElementById(idPantalla).classList.add('activa');
+      if (idPantalla === 'pantallaPerfiles') renderizarListaPerfiles();
+    }
+
+    function irAlMenu() {
+      clearInterval(temporizador);
+      cambiarPantalla('pantallaMenu');
+      actualizarTablaPuntajes();
+    }
+
+    // GESTIÓN DE PERFILES
+    function renderizarListaPerfiles() {
+      const contenedor = document.getElementById('listaPerfilesContenedor');
+      contenedor.innerHTML = '';
+      listaPerfiles.forEach(p => {
+        const item = document.createElement('div');
+        item.className = `item-perfil ${p === perfilActivo ? 'seleccionado' : ''}`;
+        item.innerHTML = `
+          <span>👤 ${p}</span>
+          <div>
+            ${p === perfilActivo ? '<span>(Activo)</span>' : `<button class="btn-sub" style="padding: 6px 10px;" onclick="seleccionarPerfil('${p}')">Seleccionar</button>`}
+          </div>
+        `;
+        contenedor.appendChild(item);
+      });
+    }
+
+    function crearNuevoPerfil() {
+      const nombreInput = document.getElementById('nuevoNombrePerfil').value.trim();
+      if (!nombreInput) return;
+      if (listaPerfiles.includes(nombreInput)) {
+        decirTexto("Ese perfil ya existe");
+        return;
+      }
+      listaPerfiles.push(nombreInput);
+      localStorage.setItem('listaPerfiles', JSON.stringify(listaPerfiles));
+      document.getElementById('nuevoNombrePerfil').value = '';
+      seleccionarPerfil(nombreInput);
+    }
+
+    function seleccionarPerfil(nombre) {
+      perfilActivo = nombre;
+      localStorage.setItem('perfilActivo', perfilActivo);
+      cargarProgresoPerfilActual();
+      decirTexto(`Perfil ${perfilActivo} seleccionado`);
+      irAlMenu();
+    }
+
+    function decirFraseEspecial(tipo, textoFallback) {
+      if (config.modoGamer) {
+        const lista = frasesGamerEspeciales[tipo];
+        const fraseRandom = lista[Math.floor(Math.random() * lista.length)];
+        decirTexto(`${fraseRandom}. ${textoFallback}`);
+      } else {
+        const lista = frasesPedagogicas[tipo];
+        const fraseRandom = lista[Math.floor(Math.random() * lista.length)];
+        decirTexto(`${fraseRandom}. ${textoFallback}`);
+      }
+    }
+
+    // 🤖 LÓGICA DE VOZ Y ANIMACIÓN DE LA MASCOTA
+    let timerOcultarGlobo = null;
+
+    function decirTexto(texto) {
+      const globo = document.getElementById('globoMascota');
+      const avatar = document.getElementById('mascotaAvatar');
+
+      globo.innerText = texto;
+      globo.classList.add('visible');
+
+      clearTimeout(timerOcultarGlobo);
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        ultimaFraseAudio = texto;
+        const mensajeVoz = new SpeechSynthesisUtterance(texto);
+        mensajeVoz.lang = 'es-MX';
+        mensajeVoz.rate = 0.85;
+
+        mensajeVoz.onstart = () => {
+          avatar.classList.add('hablando');
+        };
+
+        mensajeVoz.onend = () => {
+          avatar.classList.remove('hablando');
+          timerOcultarGlobo = setTimeout(() => {
+            globo.classList.remove('visible');
+          }, 3500);
+        };
+
+        mensajeVoz.onerror = () => {
+          avatar.classList.remove('hablando');
+        };
+
+        window.speechSynthesis.speak(mensajeVoz);
+      } else {
+        timerOcultarGlobo = setTimeout(() => {
+          globo.classList.remove('visible');
+        }, 3500);
+      }
+    }
+    
+    function repetirAudioInstruccion() {
+      if (ultimaFraseAudio) decirTexto(ultimaFraseAudio);
+      else decirTexto("¡Hola! Vamos a jugar");
+    }
+
+    function mezclar(array) {
+      let copia = [...array];
+      for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+      }
+      return copia;
+    }
+
+    function registrarAciertoLetra(letra) {
+      let L = letra.toUpperCase();
+      dbProgreso.letrasAcertadas[L] = (dbProgreso.letrasAcertadas[L] || 0) + 1;
+      dbProgreso.totalAciertosGlobal++;
+      evaluarLogros();
+      guardarProgreso();
+    }
+
+    function registrarAciertoPalabra(palabra) {
+      if (palabra.length === 3) dbProgreso.palabras3LetrasCompleta++;
+      palabra.split('').forEach(l => {
+        let L = l.toUpperCase();
+        dbProgreso.letrasAcertadas[L] = (dbProgreso.letrasAcertadas[L] || 0) + 1;
+      });
+      dbProgreso.totalAciertosGlobal++;
+      evaluarLogros();
+      guardarProgreso();
+    }
+
+    function guardarProgreso() {
+      localStorage.setItem(`dbProgreso_${perfilActivo}`, JSON.stringify(dbProgreso));
+    }
+
+    function evaluarLogros() {
+      if (dbProgreso.palabras3LetrasCompleta >= 50) desbloquearLogro('palabra_3');
+      if ((dbProgreso.letrasAcertadas['A'] || 0) >= 100) desbloquearLogro('experto_A');
+      if ((dbProgreso.letrasAcertadas['E'] || 0) >= 100) desbloquearLogro('experto_E');
+      if ((dbProgreso.letrasAcertadas['O'] || 0) >= 100) desbloquearLogro('experto_O');
+      if (dbProgreso.totalAciertosGlobal >= 500) desbloquearLogro('nivel_intermedio');
+      if (dbProgreso.totalAciertosGlobal >= 1000) desbloquearLogro('nivel_avanzado');
+    }
+
+    function desbloquearLogro(idLogro) {
+      if (!dbProgreso.logrosDesbloqueados.includes(idLogro)) {
+        dbProgreso.logrosDesbloqueados.push(idLogro);
+        guardarProgreso();
+        const logro = DEFINICION_LOGROS.find(l => l.id === idLogro);
+        if (logro) mostrarModalLogro(logro);
+      }
+    }
+
+    function mostrarModalLogro(logro) {
+      document.getElementById('modalLogroIcono').innerText = logro.icono;
+      document.getElementById('modalLogroTitulo').innerText = logro.titulo;
+      document.getElementById('modalLogroDesc').innerText = logro.desc;
+      document.getElementById('modalLogro').style.display = 'flex';
+      decirTexto(`¡Felicidades! Desbloqueaste un nuevo logro: ${logro.titulo}`);
+    }
+
+    function cerrarModalLogro() {
+      document.getElementById('modalLogro').style.display = 'none';
+    }
+
+    function mostrarPerfil() {
+      cambiarPantalla('pantallaPerfil');
+      const badge = document.getElementById('nivelJugadorBadge');
+      if (dbProgreso.totalAciertosGlobal >= 1000) badge.innerText = 'Nivel: El más Pro 👑';
+      else if (dbProgreso.totalAciertosGlobal >= 500) badge.innerText = 'Nivel: No tan Noob 🏅';
+      else badge.innerText = 'Nivel: Vaya Boot 🌱';
+
+      const gridLogros = document.getElementById('gridLogros');
+      gridLogros.innerHTML = '';
+      DEFINICION_LOGROS.forEach(logro => {
+        const esObtenido = dbProgreso.logrosDesbloqueados.includes(logro.id);
+        const div = document.createElement('div');
+        div.className = `logro-box ${esObtenido ? 'desbloqueado' : ''}`;
+        div.innerHTML = `<div class="logro-icon">${logro.icono}</div><div class="logro-title">${logro.titulo}</div>`;
+        gridLogros.appendChild(div);
+      });
+
+      const gridDominio = document.getElementById('gridDominioLetras');
+      gridDominio.innerHTML = '';
+      abecedario.forEach(letra => {
+        const aciertos = dbProgreso.letrasAcertadas[letra] || 0;
+        const div = document.createElement('div');
+        let claseDominio = '';
+        if (aciertos >= 10) claseDominio = 'experto';
+        else if (aciertos >= 3) claseDominio = 'aprendiendo';
+        else claseDominio = 'refuerzo';
+
+        div.className = `letra-dom ${claseDominio}`;
+        div.innerText = `${letra}: ${aciertos}`;
+        gridDominio.appendChild(div);
+      });
+    }
+
+    function prepararJuego(categoria, submodo) {
+      modoActual = categoria;
+      if (submodo === 'escritura') {
+        cambiarPantalla('pantallaEscritura');
+        iniciarModoEscritura(categoria === 'reto');
+      } else if (submodo === 'imagenes') {
+        document.getElementById('boxSelector').style.display = 'none';
+        cambiarPantalla('pantallaJuego');
+        rondaImagenesActual = 0;
+        iniciarRondaImagenes();
+      } else if (submodo === 'caligrafia') {
+        cambiarPantalla('pantallaCaligrafia');
+        document.getElementById('boxSelectorCaligrafia').style.display = categoria === 'libre' ? 'flex' : 'none';
+        if (categoria === 'libre') iniciarCaligrafiaLibre();
+        else if (categoria === 'reto') iniciarCaligrafiaReto();
+      } else {
+        document.getElementById('boxSelector').style.display = 'flex';
+        cambiarPantalla('pantallaJuego');
+        if (categoria === 'libre') iniciarJuegoLibre();
+        else if (categoria === 'reto') iniciarConTiempo();
+      }
+    }
+
+    function alternarMayusculasMinusculasCaligrafia() {
+      esMayusculaCaligrafia = !esMayusculaCaligrafia;
+      const btn = document.getElementById('btnToggleCase');
+      btn.innerText = esMayusculaCaligrafia ? '🔤 Aa: MAYÚS' : '🔤 Aa: minús';
+      
+      const valorPrevio = comboCaligrafia.value;
+      popularSelectores();
+      
+      if (valorPrevio !== 'MODO_PALABRA') {
+        comboCaligrafia.value = esMayusculaCaligrafia ? valorPrevio.toUpperCase() : valorPrevio.toLowerCase();
+      } else {
+        comboCaligrafia.value = 'MODO_PALABRA';
+      }
+      
+      iniciarCaligrafiaLibre();
+    }
+    /* --- MODO CALIGRAFÍA Y TRAZADO REDISEÑADO --- */
+    let canvas, ctx, dibujando = false;
+    let canvasMolde = null, ctxMolde = null;
+    let canvasTrazo = null, ctxTrazo = null;
+    
+    function obtenerGrosorPincelCalculado() {
+      const opcion = config.tamanoTrazo || 'mediano';
+      if (opcion === 'chico') return 14;
+      if (opcion === 'grande') return 30;
+      return 22;
+    }
+
+    function inicializarCanvas() {
+      canvas = document.getElementById('canvasTrazado');
+      ctx = canvas.getContext('2d');
+
+      const container = document.getElementById('containerCanvasCaligrafia');
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+
+      if (!canvasMolde) {
+        canvasMolde = document.createElement('canvas');
+        canvasTrazo = document.createElement('canvas');
+      }
+      canvasMolde.width = canvas.width;
+      canvasMolde.height = canvas.height;
+      ctxMolde = canvasMolde.getContext('2d', { willReadFrequently: true });
+
+      canvasTrazo.width = canvas.width;
+      canvasTrazo.height = canvas.height;
+      ctxTrazo = canvasTrazo.getContext('2d', { willReadFrequently: true });
+
+      const empezarDibujo = (e) => {
+        dibujando = true;
+        ctx.beginPath();
+        const pos = obtenerPosicionCanvas(e);
+        ctx.moveTo(pos.x, pos.y);
+      };
+
+      const dibujar = (e) => {
+        if (!dibujando) return;
+        const pos = obtenerPosicionCanvas(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.strokeStyle = '#6c5ce7';
+        ctx.lineWidth = obtenerGrosorPincelCalculado();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      };
+
+      const detenerDibujo = () => { dibujando = false; };
+
+      canvas.onmousedown = empezarDibujo;
+      canvas.onmousemove = dibujar;
+      canvas.onmouseup = detenerDibujo;
+      canvas.onmouseleave = detenerDibujo;
+
+      canvas.ontouchstart = (e) => { empezarDibujo(e.touches[0]); e.preventDefault(); };
+      canvas.ontouchmove = (e) => { dibujar(e.touches[0]); e.preventDefault(); };
+      canvas.ontouchend = (e) => { detenerDibujo(); e.preventDefault(); };
+    }
+    
+    function obtenerPosicionCanvas(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+
+    function dibujarGuiaPunteada(texto) {
+      if (!ctx) inicializarCanvas();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctxMolde.clearRect(0, 0, canvasMolde.width, canvasMolde.height);
+      
+      const esModoPalabras = (texto === 'MODO_PALABRA' || texto.length > 2);
+      const container = document.getElementById('containerCanvasCaligrafia');
+      
+      if (esModoPalabras) {
+        container.classList.add('modo-palabras');
+      } else {
+        container.classList.remove('modo-palabras');
+      }
+
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      canvasMolde.width = canvas.width;
+      canvasMolde.height = canvas.height;
+
+      let textoADibujar = texto;
+      
+      if (texto === 'MODO_PALABRA') {
+        const palabrasCortas = catalogoObjetos.filter(o => o.palabra.length >= 3 && o.palabra.length <= 5);
+        const catalogoSeleccion = palabrasCortas.length > 0 ? palabrasCortas : catalogoObjetos;
+        
+        const palabraObj = catalogoSeleccion[Math.floor(Math.random() * catalogoSeleccion.length)];
+        textoADibujar = esMayusculaCaligrafia ? palabraObj.palabra.toUpperCase() : palabraObj.palabra.toLowerCase();
+        letraObjetivoCaligrafia = textoADibujar;
+      }
+
+      const h = canvas.height;
+      const w = canvas.width;
+      const lineaBaseY = h * 0.72;
+      const lineaMediaY = h * 0.42;
+      const lineaTopY = h * 0.18;
+
+      ctx.save();
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(10, lineaTopY); ctx.lineTo(w - 10, lineaTopY);
+      ctx.moveTo(10, lineaBaseY); ctx.lineTo(w - 10, lineaBaseY);
+      ctx.stroke();
+
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(10, lineaMediaY); ctx.lineTo(w - 10, lineaMediaY);
+      ctx.stroke();
+      ctx.restore();
+
+      let fontSize;
+      if (textoADibujar.length === 1) {
+        fontSize = Math.floor(h * 0.65);
+      } else {
+        fontSize = Math.floor(h * 0.52);
+      }
+
+      ctx.font = `bold ${fontSize}px "Fredoka", sans-serif`;
+      ctxMolde.font = `bold ${fontSize}px "Fredoka", sans-serif`;
+
+      let textWidth = ctx.measureText(textoADibujar).width;
+      const maxAllowedWidth = w * 0.88;
+      if (textWidth > maxAllowedWidth) {
+        fontSize = Math.floor(fontSize * (maxAllowedWidth / textWidth));
+        ctx.font = `bold ${fontSize}px "Fredoka", sans-serif`;
+        ctxMolde.font = `bold ${fontSize}px "Fredoka", sans-serif`;
+      }
+
+      ctxMolde.fillStyle = '#000000';
+      ctxMolde.textAlign = 'center';
+      ctxMolde.textBaseline = 'middle';
+      ctxMolde.fillText(textoADibujar, w / 2, h * 0.46);
+
+      ctx.save();
+      ctx.fillStyle = '#f1f2f6';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(textoADibujar, w / 2, h * 0.46);
+      
+      ctx.setLineDash([8, 8]);
+      ctx.strokeStyle = '#a4b0be';
+      ctx.lineWidth = 3.5;
+      ctx.strokeText(textoADibujar, w / 2, h * 0.46);
+      ctx.restore();
+    }
+
+    function evaluarCaligrafia3Reglas() {
+      ctxTrazo.clearRect(0, 0, canvasTrazo.width, canvasTrazo.height);
+      ctxTrazo.drawImage(canvas, 0, 0);
+
+      const imgMolde = ctxMolde.getImageData(0, 0, canvasMolde.width, canvasMolde.height).data;
+      const imgTrazo = ctxTrazo.getImageData(0, 0, canvasTrazo.width, canvasTrazo.height).data;
+
+      let pixelesMoldeTotal = 0;
+      let pixelesMoldeCubiertos = 0;
+      let pixelesTrazoTotal = 0;
+      let pixelesFueraDelMolde = 0;
+
+      for (let i = 3; i < imgMolde.length; i += 4) {
+        const enMolde = imgMolde[i] > 50;
+        const esColorTrazo = imgTrazo[i - 3] < 200 && imgTrazo[i - 2] < 200 && imgTrazo[i - 1] > 150;
+        const enTrazo = imgTrazo[i] > 50 && esColorTrazo;
+
+        if (enMolde) {
+          pixelesMoldeTotal++;
+          if (enTrazo) pixelesMoldeCubiertos++;
+        }
+
+        if (enTrazo) {
+          pixelesTrazoTotal++;
+          if (!enMolde) pixelesFueraDelMolde++;
+        }
+      }
+
+      if (pixelesMoldeTotal === 0 || pixelesTrazoTotal === 0) {
+        return { esValido: false, razon: 'Sin trazo' };
+      }
+
+      const pctRelleno = (pixelesMoldeCubiertos / pixelesMoldeTotal) * 100;
+      const pctDesbordeGlobal = (pixelesFueraDelMolde / pixelesMoldeTotal) * 100;
+      const pctSobresalienteTrazo = (pixelesFueraDelMolde / pixelesTrazoTotal) * 100;
+
+      const cumpleRegla1 = pctRelleno >= 55;
+      const cumpleRegla2 = pctDesbordeGlobal <= 30;
+      const cumpleRegla3 = pctSobresalienteTrazo <= 20;
+
+      return {
+        esValido: cumpleRegla1 && cumpleRegla2 && cumpleRegla3,
+        cumpleRegla1,
+        cumpleRegla2,
+        cumpleRegla3,
+        pctRelleno
+      };
+    }
+
+    function limpiarCanvas() {
+      dibujarGuiaPunteada(letraObjetivoCaligrafia);
+    }
+
+    function iniciarCaligrafiaLibre() {
+      let valorSeleccionado = comboCaligrafia.value;
+      letraObjetivoCaligrafia = valorSeleccionado;
+
+      setTimeout(() => {
+        inicializarCanvas();
+        dibujarGuiaPunteada(letraObjetivoCaligrafia);
+      }, 50);
+
+      if (valorSeleccionado === 'MODO_PALABRA') {
+        document.getElementById('mensajeCaligrafia').innerText = `Traza la palabra en el renglón`;
+        decirTexto(`Modo palabras. Traza la palabra siguiendo la línea base y punteada`);
+      } else {
+        document.getElementById('mensajeCaligrafia').innerText = `Traza la plantilla "${letraObjetivoCaligrafia}"`;
+        decirTexto(`Traza la letra ${letraObjetivoCaligrafia}`);
+      }
+      document.getElementById('tiempoDivCaligrafia').innerText = '';
+    }
+
+    function iniciarCaligrafiaReto() {
+      letraObjetivoCaligrafia = abecedario[Math.floor(Math.random() * abecedario.length)];
+      if (!esMayusculaCaligrafia) letraObjetivoCaligrafia = letraObjetivoCaligrafia.toLowerCase();
+
+      setTimeout(() => {
+        inicializarCanvas();
+        dibujarGuiaPunteada(letraObjetivoCaligrafia);
+      }, 50);
+
+      document.getElementById('mensajeCaligrafia').innerText = `¡Rápido! Traza la "${letraObjetivoCaligrafia}"`;
+      decirTexto(`Reto de caligrafía. Traza la letra ${letraObjetivoCaligrafia} antes de que se acabe el tiempo`);
+
+      tiempoRestante = config.tiempoDesafio;
+      actualizarHUDTiempoCaligrafia();
+
+      clearInterval(temporizador);
+      temporizador = setInterval(() => {
+        tiempoRestante--;
+        actualizarHUDTiempoCaligrafia();
+        if (tiempoRestante <= 0) {
+          clearInterval(temporizador);
+          decirFraseEspecial('fail', `¡Se acabó el tiempo!`);
+          setTimeout(iniciarCaligrafiaReto, 2000);
+        }
+      }, 1000);
+    }
+
+    function actualizarHUDTiempoCaligrafia() {
+      document.getElementById('tiempoDivCaligrafia').innerText = `⏱️ Tiempo: ${tiempoRestante}s`;
+    }
+
+    function confirmarTrazoCaligrafia() {
+      const res = evaluarCaligrafia3Reglas();
+      if (!res.esValido) {
+        if (res.razon === 'Sin trazo') {
+          decirTexto("Primero debes trazar sobre la plantilla");
+        } else if (!res.cumpleRegla1) {
+          decirFraseEspecial('fail', "Te faltó cubrir más la plantilla");
+        } else {
+          decirFraseEspecial('fail', "Te saliste mucho del contorno. ¡Intenta con más cuidado!");
+        }
+        return;
+      }
+
+      if (modoActual === 'reto') clearInterval(temporizador);
+
+      registrarAciertoLetra(letraObjetivoCaligrafia.charAt(0));
+      decirFraseEspecial('success', "¡Excelente trazo!");
+
+      if (modoActual === 'reto') {
+        setTimeout(iniciarCaligrafiaReto, 1500);
+      } else {
+        setTimeout(() => {
+          if (comboCaligrafia.value === 'MODO_PALABRA') {
+            dibujarGuiaPunteada('MODO_PALABRA');
+          } else {
+            limpiarCanvas();
+          }
+        }, 1500);
+      }
+    }
+    /* --- BÚSQUEDA DE LETRAS (TABLERO) --- */
+    function iniciarJuegoLibre() {
+      const letraSel = combo.value.toLowerCase();
+      const cantidad = config.cantidadTablero;
+      totalCorrectas = Math.floor(cantidad * 0.3) + 1;
+      encontradas = 0;
+
+      const tablero = document.getElementById('tablero');
+      tablero.innerHTML = '';
+      document.getElementById('tiempoDiv').innerText = '';
+
+      let arrayLetras = [];
+      for (let i = 0; i < totalCorrectas; i++) arrayLetras.push(letraSel);
+      while (arrayLetras.length < cantidad) {
+        let l = abecedario[Math.floor(Math.random() * abecedario.length)].toLowerCase();
+        if (l !== letraSel) arrayLetras.push(l);
+      }
+      arrayLetras = mezclar(arrayLetras);
+
+      document.getElementById('mensaje').innerText = `Encuentra todas las "${letraSel.toUpperCase()}" (${encontradas}/${totalCorrectas})`;
+      decirTexto(`Encuentra todas las letras ${letraSel.toUpperCase()}`);
+
+      arrayLetras.forEach(char => {
+        const div = document.createElement('div');
+        let txtMostrar = char;
+        if (config.formatoLetras === 'mayusculas') txtMostrar = char.toUpperCase();
+        else if (config.formatoLetras === 'minusculas') txtMostrar = char.toLowerCase();
+        else txtMostrar = Math.random() > 0.5 ? char.toUpperCase() : char.toLowerCase();
+
+        div.className = `letra tamano-${config.tamanoLetra || 'normal'} ${estilos[Math.floor(Math.random() * estilos.length)]}`;
+        div.innerText = txtMostrar;
+
+        div.onclick = () => {
+          if (char === letraSel) {
+            if (!div.classList.contains('correcta')) {
+              div.classList.add('correcta');
+              encontradas++;
+              registrarAciertoLetra(char);
+              document.getElementById('mensaje').innerText = `Encuentra todas las "${letraSel.toUpperCase()}" (${encontradas}/${totalCorrectas})`;
+              if (encontradas === totalCorrectas) {
+                decirFraseEspecial('success', `¡Encontraste todas las letras ${letraSel.toUpperCase()}!`);
+              } else {
+                decirTexto("¡Muy bien!");
+              }
+            }
+          } else {
+            div.classList.add('incorrecta');
+            decirFraseEspecial('fail', `Esa es la letra ${char.toUpperCase()}`);
+          }
+        };
+        tablero.appendChild(div);
+      });
+    }
+
+    function iniciarConTiempo() {
+      let lObj = abecedario[Math.floor(Math.random() * abecedario.length)].toLowerCase();
+      combo.value = lObj;
+      iniciarJuegoLibre();
+
+      tiempoRestante = config.tiempoDesafio;
+      actualizarHUDTiempo();
+
+      clearInterval(temporizador);
+      temporizador = setInterval(() => {
+        tiempoRestante--;
+        actualizarHUDTiempo();
+        if (tiempoRestante <= 0) {
+          clearInterval(temporizador);
+          decirFraseEspecial('fail', `¡Se acabó el tiempo! Encontraste ${encontradas} de ${totalCorrectas}`);
+        }
+      }, 1000);
+    }
+
+    function actualizarHUDTiempo() {
+      document.getElementById('tiempoDiv').innerText = `⏱️ Tiempo: ${tiempoRestante}s`;
+    }
+
+    /* --- EXPLORADOR Y RETO DE IMÁGENES --- */
+    function iniciarRondaImagenes() {
+      const cantidadImgs = config.cantidadImagenesGrid || 6;
+      let catalogoMezclado = mezclar(catalogoObjetos);
+      let seleccion = catalogoMezclado.slice(0, cantidadImgs);
+      
+      let objetivo = seleccion[Math.floor(Math.random() * seleccion.length)];
+      letraObjetivoImagenes = objetivo.letra;
+
+      document.getElementById('tiempoDiv').innerText = modoActual === 'reto' ? `⏱️ Tiempo: ${tiempoRestante}s` : '';
+      document.getElementById('mensaje').innerText = `¿Cuál objeto empieza con la letra "${letraObjetivoImagenes}"?`;
+      decirTexto(`Toca la imagen que empieza con la letra ${letraObjetivoImagenes}`);
+
+      const tablero = document.getElementById('tablero');
+      tablero.innerHTML = '';
+
+      const grid = document.createElement('div');
+      grid.className = `grid-imagenes cant-${cantidadImgs}`;
+
+      seleccion.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'tarjeta-img';
+        card.innerHTML = `<span class="emoji">${item.emoji}</span><span class="nombre-obj">${item.palabra}</span>`;
+
+        card.onclick = () => {
+          if (item.letra === letraObjetivoImagenes) {
+            card.classList.add('correcta');
+            registrarAciertoLetra(item.letra);
+            decirFraseEspecial('success', `¡Correcto! ${item.palabra} empieza con ${item.letra}`);
+            
+            rondaImagenesActual++;
+            const maxRondas = config.rondasImagenes || 5;
+            if (rondaImagenesActual < maxRondas) {
+              setTimeout(iniciarRondaImagenes, 1800);
+            } else {
+              setTimeout(() => {
+                decirFraseEspecial('success', "¡Completaste todas las rondas de imágenes!");
+                irAlMenu();
+              }, 2000);
+            }
+          } else {
+            card.classList.add('incorrecta');
+            decirFraseEspecial('fail', `${item.palabra} empieza con la letra ${item.letra}`);
+          }
+        };
+        grid.appendChild(card);
+      });
+      tablero.appendChild(grid);
+    }
+
+    /* --- MODO ESCRITURA DE PALABRAS --- */
+    function iniciarModoEscritura(esReto) {
+      let pool = bancoPalabras[config.dificultadEscritura] || bancoPalabras.facil;
+      palabrasJuegoActual = mezclar(pool).slice(0, config.cantidadPalabrasEscritura);
+      indicePalabraActual = 0;
+      cargarPalabraEscritura();
+    }
+
+    function cargarPalabraEscritura() {
+      if (indicePalabraActual >= palabrasJuegoActual.length) {
+        decirFraseEspecial('success', "¡Felicidades! Completaste todas las palabras");
+        irAlMenu();
+        return;
+      }
+
+      palabraObjetivoObj = palabrasJuegoActual[indicePalabraActual];
+      letrasIngresadas = [];
+      intentosFallidosPalabra = 0;
+
+      document.getElementById('contadorPalabras').innerText = `Palabra ${indicePalabraActual + 1}/${palabrasJuegoActual.length}`;
+      document.getElementById('emojiDisplay').innerText = palabraObjetivoObj.emoji;
+      document.getElementById('mensajeEscritura').innerText = `Forma la palabra:`;
+      decirTexto(`Forma la palabra ${palabraObjetivoObj.palabra}`);
+
+      renderizarCasillasEscritura();
+      renderizarTecladoEscritura();
+    }
+
+    function renderizarCasillasEscritura() {
+      const contenedor = document.getElementById('casillasPalabra');
+      contenedor.innerHTML = '';
+
+      const pObj = palabraObjetivoObj.palabra;
+      for (let i = 0; i < pObj.length; i++) {
+        const div = document.createElement('div');
+        div.className = 'casilla';
+        if (letrasIngresadas[i]) {
+          div.classList.add('llena');
+          div.innerText = letrasIngresadas[i];
+        } else if (intentosFallidosPalabra >= 2 && i === letrasIngresadas.length) {
+          div.classList.add('casilla-pista');
+          div.innerText = pObj[i];
+        } else {
+          div.innerText = '';
+        }
+
+        div.onclick = () => {
+          if (letrasIngresadas.length > i) {
+            letrasIngresadas.splice(i, 1);
+            renderizarCasillasEscritura();
+          }
+        };
+        contenedor.appendChild(div);
+      }
+    }
+
+    function renderizarTecladoEscritura() {
+      const teclado = document.getElementById('tecladoEscritura');
+      teclado.innerHTML = '';
+
+      let letrasPalabra = palabraObjetivoObj.palabra.split('');
+      let letrasRelleno = [];
+      while (letrasRelleno.length < 4) {
+        let l = abecedario[Math.floor(Math.random() * abecedario.length)];
+        if (!letrasPalabra.includes(l)) letrasRelleno.push(l);
+      }
+
+      let opcionesTeclado = mezclar([...letrasPalabra, ...letrasRelleno]);
+
+      opcionesTeclado.forEach(char => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-sub';
+        btn.style.cssText = 'width: 48px; height: 50px; font-size: 22px; justify-content: center; padding: 0; box-shadow: 0 4px 0 #b2bec3;';
+        btn.innerText = char;
+
+        btn.onclick = () => {
+          if (letrasIngresadas.length < palabraObjetivoObj.palabra.length) {
+            letrasIngresadas.push(char);
+            renderizarCasillasEscritura();
+            comprobarPalabraEscritura();
+          }
+        };
+        teclado.appendChild(btn);
+      });
+    }
+
+    function comprobarPalabraEscritura() {
+      if (letrasIngresadas.length === palabraObjetivoObj.palabra.length) {
+        let intento = letrasIngresadas.join('');
+        if (intento === palabraObjetivoObj.palabra) {
+          registrarAciertoPalabra(palabraObjetivoObj.palabra);
+          decirFraseEspecial('success', `¡Excelente! Escribiste ${palabraObjetivoObj.palabra}`);
+          indicePalabraActual++;
+          setTimeout(cargarPalabraEscritura, 1600);
+        } else {
+          intentosFallidosPalabra++;
+          decirFraseEspecial('fail', `Esa no es la palabra correcta. Intenta de nuevo`);
+          setTimeout(() => {
+            letrasIngresadas = [];
+            renderizarCasillasEscritura();
+          }, 1200);
+        }
+      }
+    }
+
+    /* --- MODO QUIZZ (SISTEMA EVALUATIVO COMPLETO) --- */
+    function iniciarQuizDirecto(tipo) {
+      tipoQuizActual = tipo;
+      rondaQuiz = 0;
+      aciertosQuiz = 0;
+      erroresQuiz = 0;
+      historialErroresQuiz = [];
+
+      document.getElementById('boxSelector').style.display = 'none';
+      cambiarPantalla('pantallaJuego');
+
+      tiempoRestante = config.tiempoQuiz;
+      actualizarHUDTiempoQuiz();
+
+      clearInterval(temporizador);
+      temporizador = setInterval(() => {
+        tiempoRestante--;
+        actualizarHUDTiempoQuiz();
+        if (tiempoRestante <= 0) {
+          clearInterval(temporizador);
+          finalizarQuiz();
+        }
+      }, 1000);
+
+      siguientePreguntaQuiz();
+    }
+
+    function actualizarHUDTiempoQuiz() {
+      document.getElementById('tiempoDiv').innerText = `⏳ Tiempo Quizz: ${tiempoRestante}s | Pregunta: ${rondaQuiz + 1}/${config.preguntasQuiz}`;
+    }
+
+    function siguientePreguntaQuiz() {
+      if (rondaQuiz >= config.preguntasQuiz) {
+        clearInterval(temporizador);
+        finalizarQuiz();
+        return;
+      }
+
+      let subTipo = tipoQuizActual;
+      if (tipoQuizActual === 'mixto') {
+        const tipos = ['letras', 'escritura', 'imagenes', 'caligrafia'];
+        subTipo = tipos[Math.floor(Math.random() * tipos.length)];
+      }
+
+      if (subTipo === 'letras') generarQuizLetras();
+      else if (subTipo === 'escritura') generarQuizEscritura();
+      else if (subTipo === 'imagenes') generarQuizImagenes();
+      else if (subTipo === 'caligrafia') generarQuizCaligrafia();
+    }
+
+    function generarQuizLetras() {
+      let lObj = abecedario[Math.floor(Math.random() * abecedario.length)];
+      letraObjetivoQuiz = lObj;
+
+      document.getElementById('mensaje').innerText = `Selecciona únicamente la letra "${lObj}"`;
+      decirTexto(`Selecciona la letra ${lObj}`);
+
+      const tablero = document.getElementById('tablero');
+      tablero.innerHTML = '';
+
+      let opciones = [lObj];
+      while (opciones.length < 4) {
+        let alt = abecedario[Math.floor(Math.random() * abecedario.length)];
+        if (!opciones.includes(alt)) opciones.push(alt);
+      }
+      opciones = mezclar(opciones);
+
+      opciones.forEach(char => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-menu';
+        btn.style.cssText = 'width: 45%; font-size: 28px; margin: 8px; background: #6c5ce7;';
+        btn.innerText = char;
+
+        btn.onclick = () => {
+          if (char === lObj) {
+            aciertosQuiz++;
+            registrarAciertoLetra(char);
+            decirTexto("¡Bien!");
+          } else {
+            erroresQuiz++;
+            historialErroresQuiz.push(`Letra ${lObj} (confundida con ${char})`);
+            decirTexto("Incorrecto");
+          }
+          rondaQuiz++;
+          siguientePreguntaQuiz();
+        };
+        tablero.appendChild(btn);
+      });
+    }
+
+    function generarQuizEscritura() {
+      let obj = catalogoObjetos[Math.floor(Math.random() * catalogoObjetos.length)];
+      document.getElementById('mensaje').innerText = `¿Con qué letra empieza ${obj.emoji} ${obj.palabra}?`;
+      decirTexto(`¿Con qué letra empieza ${obj.palabra}?`);
+
+      const tablero = document.getElementById('tablero');
+      tablero.innerHTML = '';
+
+      let opciones = [obj.letra];
+      while (opciones.length < 4) {
+        let alt = abecedario[Math.floor(Math.random() * abecedario.length)];
+        if (!opciones.includes(alt)) opciones.push(alt);
+      }
+      opciones = mezclar(opciones);
+
+      opciones.forEach(char => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-menu';
+        btn.style.cssText = 'width: 45%; font-size: 28px; margin: 8px; background: #00b894;';
+        btn.innerText = char;
+
+        btn.onclick = () => {
+          if (char === obj.letra) {
+            aciertosQuiz++;
+            registrarAciertoLetra(char);
+            decirTexto("¡Correcto!");
+          } else {
+            erroresQuiz++;
+            historialErroresQuiz.push(`Inicial de ${obj.palabra} es ${obj.letra}`);
+            decirTexto("Erróneo");
+          }
+          rondaQuiz++;
+          siguientePreguntaQuiz();
+        };
+        tablero.appendChild(btn);
+      });
+    }
+
+    function generarQuizImagenes() {
+      let lObj = abecedario[Math.floor(Math.random() * abecedario.length)];
+      let correctos = catalogoObjetos.filter(o => o.letra === lObj);
+      if (correctos.length === 0) {
+        generarQuizImagenes();
+        return;
+      }
+
+      let objCorrecto = correctos[Math.floor(Math.random() * correctos.length)];
+      let incorrectos = catalogoObjetos.filter(o => o.letra !== lObj);
+      let opciones = mezclar(incorrectos).slice(0, 3);
+      opciones.push(objCorrecto);
+      opciones = mezclar(opciones);
+
+      document.getElementById('mensaje').innerText = `¿Cuál imagen empieza con "${lObj}"?`;
+      decirTexto(`¿Cuál imagen empieza con la letra ${lObj}?`);
+
+      const tablero = document.getElementById('tablero');
+      tablero.innerHTML = '';
+
+      const grid = document.createElement('div');
+      grid.className = 'grid-imagenes cant-4';
+
+      opciones.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'tarjeta-img';
+        card.innerHTML = `<span class="emoji">${item.emoji}</span><span class="nombre-obj">${item.palabra}</span>`;
+
+        card.onclick = () => {
+          if (item.letra === lObj) {
+            aciertosQuiz++;
+            registrarAciertoLetra(lObj);
+            decirTexto("¡Excelente!");
+          } else {
+            erroresQuiz++;
+            historialErroresQuiz.push(`Imagen con ${lObj}`);
+            decirTexto("Incorrecto");
+          }
+          rondaQuiz++;
+          siguientePreguntaQuiz();
+        };
+        grid.appendChild(card);
+      });
+      tablero.appendChild(grid);
+    }
+
+    function generarQuizCaligrafia() {
+      cambiarPantalla('pantallaCaligrafia');
+      document.getElementById('boxSelectorCaligrafia').style.display = 'none';
+
+      let lObj = abecedario[Math.floor(Math.random() * abecedario.length)];
+      letraObjetivoCaligrafia = lObj;
+
+      setTimeout(() => {
+        inicializarCanvas();
+        dibujarGuiaPunteada(letraObjetivoCaligrafia);
+      }, 50);
+
+      document.getElementById('mensajeCaligrafia').innerText = `Quizz: Traza la letra "${lObj}"`;
+      decirTexto(`Quizz de caligrafía. Traza la letra ${lObj}`);
+    }
+
+    function finalizarQuiz() {
+      const puntajeFinal = aciertosQuiz * 10;
+      guardarPuntajeLeaderboard(puntajeFinal);
+
+      const tablero = document.getElementById('tablero');
+      if (!tablero.isSameNode(document.activeElement)) cambiarPantalla('pantallaJuego');
+
+      tablero.innerHTML = '';
+      document.getElementById('tiempoDiv').innerText = '🏆 Quizz Finalizado';
+
+      let reporteErrores = historialErroresQuiz.length > 0
+        ? `<div style="text-align: left; background: #fffdf0; padding: 10px; border-radius: 12px; margin-top: 10px; font-size: 12px; color: #d35400;">
+            <strong>Refuerzo pedagógico:</strong><br>• ${historialErroresQuiz.slice(0, 3).join('<br>• ')}
+           </div>`
+        : '<p style="color: #00b894; font-weight: 700;">¡Puntaje Perfecto! Sin errores.</p>';
+
+      tablero.innerHTML = `
+        <div style="width: 100%; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+          <h2 style="color: var(--primary); margin-top: 0;">Resultados del Quizz</h2>
+          <p style="font-size: 22px; font-weight: 700; color: #2d3436;">Puntaje: ${puntajeFinal} pts</p>
+          <p style="font-size: 16px;">Aciertos: <strong style="color: #00b894;">${aciertosQuiz}</strong> | Errores: <strong style="color: #d63031;">${erroresQuiz}</strong></p>
+          ${reporteErrores}
+          <button class="btn-menu btn-guardar" style="margin-top: 15px;" onclick="irAlMenu()">Volver al Menú</button>
+        </div>
+      `;
+
+      decirFraseEspecial('success', `Quizz completado. Obtuviste ${puntajeFinal} puntos`);
+    }
+
+    function guardarPuntajeLeaderboard(puntos) {
+      let tabla = JSON.parse(localStorage.getItem(`puntajes_${perfilActivo}`)) || [];
+      const fecha = new Date().toLocaleDateString('es-MX', { month: 'short', day: 'numeric' });
+      tabla.push({ puntos, fecha });
+      tabla.sort((a, b) => b.puntos - a.puntos);
+      tabla = tabla.slice(0, 5);
+      localStorage.setItem(`puntajes_${perfilActivo}`, JSON.stringify(tabla));
+    }
+
+    function actualizarTablaPuntajes() {
+      const div = document.getElementById('listaPuntajes');
+      let tabla = JSON.parse(localStorage.getItem(`puntajes_${perfilActivo}`)) || [];
+      if (tabla.length === 0) {
+        div.innerHTML = '<p style="font-size: 12px; color: #b2bec3;">Sin puntajes aún</p>';
+        return;
+      }
+      div.innerHTML = '';
+      tabla.forEach((item, idx) => {
+        const s = document.createElement('div');
+        s.className = 'score-item';
+        s.innerHTML = `<span>#${idx + 1} - ${item.fecha}</span><strong>${item.puntos} pts</strong>`;
+        div.appendChild(s);
+      });
+    }
+  </script>
+</body>
+</html>
