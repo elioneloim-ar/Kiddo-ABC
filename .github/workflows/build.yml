@@ -1,4 +1,4 @@
-name: Build Android App
+  name: Build Android App
 
 on:
   push:
@@ -30,8 +30,8 @@ jobs:
 
       - name: Initialize Web Project and Capacitor
         run: |
-          mkdir www
-          cp index.html www/
+          mkdir -p www
+          cp *.html www/ 2>/dev/null || cp index.html www/
           npm init -y
           npm install @capacitor/core @capacitor/android
           npm install -D @capacitor/cli
